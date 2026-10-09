@@ -1,0 +1,13 @@
+{
+  "scene": "s1-chaos-home",
+  "duration_s": 4.0,
+  "rules": ["spring-pop-entrance", "chromatic-glitch", "stat-bars-and-fills", "particle-burst"],
+  "exit": {
+    "vector": "app window at rest (x 60-1020, y 560-1600); ring-3 sparkle burst still radiating outward ~260-520 px/s from the bottom-right ring (about 72% through its 0.5s flight, fading); ambient twinkles drifting up ~14 px/s; background glows easing to rest (sine.inOut ends at 4.0s)",
+    "still_moving": true
+  },
+  "entry": {
+    "vector": "spreadsheet A slams in left-to-right from x -1150 px (expo.out over 0.42s), initial speed about 19000 px/s rightward with a -12deg to 0deg rotation settle",
+    "from_rest": false
+  }
+}

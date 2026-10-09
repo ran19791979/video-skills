@@ -1,0 +1,598 @@
+<template>
+  <style>
+    @font-face { font-family: "Rubik"; src: url("assets/fonts/rubik-hebrew-400-normal.woff2") format("woff2"); font-weight: 400; unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F; }
+    @font-face { font-family: "Rubik"; src: url("assets/fonts/rubik-latin-400-normal.woff2") format("woff2"); font-weight: 400; }
+    @font-face { font-family: "Rubik"; src: url("assets/fonts/rubik-hebrew-500-normal.woff2") format("woff2"); font-weight: 500; unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F; }
+    @font-face { font-family: "Rubik"; src: url("assets/fonts/rubik-latin-500-normal.woff2") format("woff2"); font-weight: 500; }
+    @font-face { font-family: "Rubik"; src: url("assets/fonts/rubik-hebrew-600-normal.woff2") format("woff2"); font-weight: 600; unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F; }
+    @font-face { font-family: "Rubik"; src: url("assets/fonts/rubik-latin-600-normal.woff2") format("woff2"); font-weight: 600; }
+    @font-face { font-family: "Rubik"; src: url("assets/fonts/rubik-hebrew-700-normal.woff2") format("woff2"); font-weight: 700; unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F; }
+    @font-face { font-family: "Rubik"; src: url("assets/fonts/rubik-latin-700-normal.woff2") format("woff2"); font-weight: 700; }
+
+    #root {
+      position: absolute;
+      inset: 0;
+      width: 1080px;
+      height: 1920px;
+      overflow: hidden;
+      font-family: "Rubik", sans-serif;
+    }
+
+    /* ---------- full-bleed background (own clip layer) ---------- */
+    #s2-gantt-todos-bg {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      background: radial-gradient(ellipse at 50% 30%, #2a0a52 0%, #14052b 70%);
+    }
+    .s2gt-glow { position: absolute; border-radius: 50%; }
+    #s2-gantt-todos-glow-a {
+      left: -170px; top: 10px; width: 900px; height: 900px;
+      background: radial-gradient(circle, rgba(109, 0, 204, 0.5) 0%, rgba(109, 0, 204, 0) 68%);
+    }
+    #s2-gantt-todos-glow-b {
+      left: 380px; top: 1330px; width: 900px; height: 900px;
+      background: radial-gradient(circle, rgba(165, 24, 219, 0.38) 0%, rgba(165, 24, 219, 0) 68%);
+    }
+    #s2-gantt-todos-floor {
+      left: 60px; top: 1520px; width: 960px; height: 300px;
+      background: radial-gradient(ellipse at 50% 35%, rgba(109, 0, 204, 0.6) 0%, rgba(109, 0, 204, 0) 70%);
+    }
+    .s2gt-amb {
+      position: absolute;
+      clip-path: polygon(50% 0%, 61% 39%, 100% 50%, 61% 61%, 50% 100%, 39% 61%, 0% 50%, 39% 39%);
+      opacity: 0;
+    }
+
+    /* ---------- stage + app window (frame.md app-window spec) ---------- */
+    #s2-gantt-todos-stage { position: absolute; inset: 0; }
+    #s2-gantt-todos-winglow {
+      position: absolute; left: 60px; top: 560px; width: 960px; height: 1040px;
+      border-radius: 44px;
+      box-shadow: 0 0 90px 12px rgba(109, 0, 204, 0.75), 0 0 26px rgba(201, 168, 245, 0.55);
+      opacity: 0;
+    }
+    #s2-gantt-todos-win {
+      position: absolute; left: 60px; top: 560px; width: 960px; height: 1040px;
+      border-radius: 44px;
+      background: #f8f7fb;
+      overflow: hidden;
+      box-shadow: 0 40px 120px rgba(20, 5, 43, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.08), 0 0 80px rgba(109, 0, 204, 0.45);
+    }
+    .s2gt-screen {
+      position: absolute; left: 0; top: 0; width: 960px; height: 1040px;
+      background: #f8f7fb;
+      color: #221933;
+      direction: rtl;
+      transform-origin: 50% 50%;
+    }
+    #s2-gantt-todos-tasks { z-index: 2; opacity: 0; }
+    #s2-gantt-todos-flash {
+      position: absolute; inset: 0; z-index: 5;
+      background: radial-gradient(circle at 50% 50%, #ffffff 0%, #fbf7ff 35%, #e5cffa 100%);
+      opacity: 0;
+    }
+
+    /* topbar (2x of .topbar) */
+    .s2gt-topbar {
+      position: absolute; left: 0; right: 0; top: 0; height: 112px;
+      background: #ffffff;
+      border-bottom: 2px solid #ece8f2;
+      display: flex; align-items: center; gap: 20px;
+      padding: 0 36px;
+    }
+    .s2gt-ttitle { font-size: 34px; font-weight: 700; color: #221933; }
+    .s2gt-spacer { flex: 1; }
+    .s2gt-search {
+      display: flex; align-items: center; gap: 14px;
+      height: 68px; width: 290px; padding: 0 22px;
+      background: #f8f7fb; border: 3px solid #ece8f2; border-radius: 20px;
+      color: #918aa3; font-size: 26px;
+    }
+    .s2gt-search svg { width: 30px; height: 30px; flex-shrink: 0; }
+    .s2gt-bell {
+      position: relative; width: 68px; height: 68px; border-radius: 20px;
+      border: 3px solid #ece8f2; background: #ffffff;
+      display: grid; place-items: center; color: #5d5470;
+    }
+    .s2gt-bell svg { width: 34px; height: 34px; }
+    .s2gt-badge {
+      position: absolute; top: 9px; right: 11px; width: 18px; height: 18px; border-radius: 50%;
+      background: #6d00cc; border: 3px solid #ffffff;
+    }
+
+    /* content area */
+    .s2gt-content { position: absolute; left: 0; right: 0; top: 112px; bottom: 120px; padding: 28px 36px 0; }
+
+    /* mobile nav (2x of .mobile-nav) */
+    .s2gt-nav {
+      position: absolute; left: 0; right: 0; bottom: 0; height: 120px;
+      background: #ffffff;
+      border-top: 2px solid #ece8f2;
+      box-shadow: 0 -8px 40px rgba(34, 25, 51, 0.08);
+      display: grid; grid-template-columns: repeat(5, 1fr); align-items: center;
+    }
+    .s2gt-navi {
+      position: relative;
+      display: flex; flex-direction: column; align-items: center; gap: 6px;
+      color: #797388; font-size: 21px; font-weight: 500;
+    }
+    .s2gt-navi svg { position: relative; z-index: 2; width: 42px; height: 42px; }
+    .s2gt-navi span { position: relative; z-index: 2; }
+    .s2gt-navi.is-active { color: #6d00cc; }
+    .s2gt-navpill {
+      position: absolute; left: 50%; top: 50%; width: 140px; height: 100px; margin: -50px 0 0 -70px;
+      border-radius: 28px; background: #f5ebff; z-index: 1;
+    }
+    .s2gt-navglow {
+      position: absolute; left: 50%; top: 50%; width: 230px; height: 170px; margin: -85px 0 0 -115px;
+      border-radius: 50%;
+      background: radial-gradient(closest-side, rgba(109, 0, 204, 0.42), rgba(165, 24, 219, 0.16) 60%, rgba(165, 24, 219, 0));
+      z-index: 0; opacity: 0;
+    }
+    .s2gt-navripple {
+      position: absolute; left: 50%; top: 50%; width: 110px; height: 110px; margin: -55px 0 0 -55px;
+      border-radius: 50%; border: 4px solid #a518db; z-index: 3; opacity: 0;
+    }
+
+    /* ---------- gantt page (ganttSection() at 2x) ---------- */
+    .s2gt-toolbar { display: flex; align-items: center; gap: 20px; height: 82px; margin-bottom: 22px; }
+    .s2gt-monthnav {
+      display: inline-flex; align-items: center; gap: 8px; height: 82px;
+      background: #ffffff; border: 3px solid #ece8f2; border-radius: 20px; padding: 8px;
+    }
+    .s2gt-mbtn { width: 60px; height: 60px; border-radius: 16px; display: grid; place-items: center; color: #5d5470; }
+    .s2gt-mbtn svg { width: 30px; height: 30px; }
+    .s2gt-mlabel { font-weight: 700; font-size: 29px; padding: 0 18px; min-width: 230px; text-align: center; }
+    .s2gt-filter {
+      display: inline-flex; align-items: center; gap: 14px; height: 64px; padding: 0 24px;
+      border-radius: 999px; background: #f5ebff; color: #6d00cc; font-size: 25px; font-weight: 600;
+    }
+    .s2gt-fdots { display: inline-flex; }
+    .s2gt-fdots i { display: block; width: 22px; height: 22px; border-radius: 50%; border: 3px solid #f5ebff; margin-inline-start: -9px; }
+    .s2gt-fdots i:first-child { margin-inline-start: 0; }
+    .s2gt-filter svg { width: 24px; height: 24px; }
+
+    .s2gt-gcard {
+      background: #ffffff; border: 2px solid #ece8f2; border-radius: 36px; padding: 20px;
+      box-shadow: 0 4px 20px rgba(34, 25, 51, 0.07);
+    }
+    .s2gt-gantt {
+      display: grid; grid-template-columns: 236px repeat(12, 1fr);
+      border: 2px solid #ece8f2; border-radius: 28px; background: #ffffff;
+    }
+    .s2gt-gc {
+      position: relative; height: 94px;
+      border-bottom: 2px solid #ece8f2; border-inline-start: 2px solid #f3f0f8;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .s2gt-gc.is-last { border-bottom: none; }
+    .s2gt-gc.is-weekend { background: #f8f7fb; }
+    .s2gt-gc.is-today { background: #f5ebff; }
+    .s2gt-hday { height: 68px; background: #faf8fd; color: #918aa3; }
+    .s2gt-hday.is-today { background: #f5ebff; }
+    .s2gt-hday.is-today::before {
+      content: ""; position: absolute; top: 0; left: 7px; right: 7px; height: 7px;
+      border-radius: 0 0 7px 7px; background: #6d00cc;
+    }
+    .s2gt-hin { display: flex; flex-direction: column; align-items: center; line-height: 1.05; gap: 3px; }
+    .s2gt-dow { font-size: 18px; font-weight: 500; color: #767084; }
+    .s2gt-dnum { font-size: 25px; font-weight: 700; color: #5d5470; }
+    .s2gt-hday.is-today .s2gt-dnum, .s2gt-hday.is-today .s2gt-dow { color: #6d00cc; }
+    .s2gt-hclient, .s2gt-client {
+      justify-content: flex-start; padding: 0 20px; background: #faf8fd; border-inline-start: none;
+      white-space: nowrap;
+    }
+    .s2gt-hclient { height: 68px; font-size: 22px; font-weight: 600; color: #767084; }
+    .s2gt-client { font-size: 24px; font-weight: 600; color: #221933; }
+    .s2gt-cin { display: flex; align-items: center; gap: 12px; }
+    .s2gt-swatch { display: block; width: 18px; height: 18px; border-radius: 5px; flex-shrink: 0; }
+    .s2gt-r-tr { border-top-right-radius: 26px; }
+    .s2gt-r-tl { border-top-left-radius: 26px; }
+    .s2gt-r-br { border-bottom-right-radius: 26px; }
+    .s2gt-r-bl { border-bottom-left-radius: 26px; }
+    .s2gt-dot {
+      display: block; position: relative; z-index: 3;
+      width: 38px; height: 38px; border-radius: 50%;
+      border: 4px solid #ffffff;
+      box-shadow: 0 4px 12px rgba(34, 25, 51, 0.24);
+      transform-origin: 50% 100%;
+    }
+    .s2gt-ring {
+      display: block; position: absolute; left: 50%; top: 50%; z-index: 2;
+      width: 38px; height: 38px; margin: -19px 0 0 -19px;
+      border-radius: 50%; border: 3px solid #6d00cc; opacity: 0;
+    }
+    .s2gt-legend {
+      display: flex; flex-wrap: wrap; justify-content: center; gap: 14px 30px;
+      margin-top: 22px; font-size: 23px; color: #5d5470;
+    }
+    .s2gt-legend span { display: inline-flex; align-items: center; gap: 10px; }
+    .s2gt-legend i { display: block; width: 18px; height: 18px; border-radius: 50%; }
+
+    /* ---------- tasks page (renderTodos()/todoRowHtml at 2x) ---------- */
+    .s2gt-thead { position: absolute; top: 28px; left: 36px; right: 36px; height: 60px; display: flex; align-items: center; }
+    .s2gt-summary { font-size: 29px; font-weight: 600; color: #5d5470; white-space: nowrap; }
+    .s2gt-num {
+      display: inline-block; height: 38px; line-height: 38px; overflow: hidden; vertical-align: bottom;
+      color: #6d00cc; font-weight: 700;
+    }
+    .s2gt-numcol { display: block; }
+    .s2gt-numcol span { display: block; height: 38px; text-align: center; }
+    .s2gt-toggle { display: flex; gap: 4px; padding: 6px; background: #f8f7fb; border: 2px solid #ece8f2; border-radius: 999px; }
+    .s2gt-tbtn { padding: 10px 24px; border-radius: 999px; font-size: 23px; font-weight: 600; color: #5d5470; }
+    .s2gt-tbtn.is-on { background: #6d00cc; color: #ffffff; }
+
+    .s2gt-card {
+      position: absolute; left: 36px; right: 36px;
+      background: #ffffff; border: 2px solid #ece8f2; border-radius: 36px;
+      box-shadow: 0 4px 20px rgba(34, 25, 51, 0.07);
+    }
+    #s2-gantt-todos-urgent { top: 108px; height: 112px; padding: 16px 28px; }
+    .s2gt-ulabel { display: flex; align-items: center; gap: 10px; font-size: 24px; font-weight: 700; color: #d92d20; }
+    .s2gt-ulabel svg { width: 28px; height: 28px; }
+    .s2gt-ulist { display: flex; gap: 40px; margin-top: 8px; font-size: 25px; color: #221933; }
+    .s2gt-uitem { display: flex; align-items: center; gap: 12px; white-space: nowrap; }
+    .s2gt-uitem i { display: block; width: 10px; height: 10px; border-radius: 50%; background: #c9a8f5; flex-shrink: 0; }
+    .s2gt-utext { position: relative; display: inline-block; }
+
+    #s2-gantt-todos-list { top: 238px; height: 482px; }
+    .s2gt-row {
+      position: absolute; left: 18px; right: 18px; height: 104px;
+      background: #ffffff; border: 2px solid #ece8f2; border-radius: 28px;
+      box-shadow: 0 0 0 rgba(34, 25, 51, 0);
+      display: flex; align-items: center; gap: 22px; padding: 0 24px;
+      z-index: 1;
+    }
+    #s2-gantt-todos-row0 { z-index: 3; }
+    .s2gt-check { position: relative; width: 52px; height: 52px; flex-shrink: 0; z-index: 2; }
+    .s2gt-check svg { position: relative; z-index: 2; display: block; width: 52px; height: 52px; overflow: visible; }
+    .s2gt-ccircle { fill: rgba(109, 0, 204, 0); stroke: #d9d2e4; stroke-width: 2; }
+    .s2gt-cmark { fill: none; stroke: #ffffff; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
+    .s2gt-cburst {
+      position: absolute; left: 50%; top: 50%; width: 52px; height: 52px; margin: -26px 0 0 -26px; z-index: 1;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(109, 0, 204, 0.7) 0%, rgba(165, 24, 219, 0.32) 45%, rgba(165, 24, 219, 0) 70%);
+      opacity: 0;
+    }
+    .s2gt-rbody { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: flex-start; gap: 8px; }
+    .s2gt-rtitle { position: relative; display: inline-block; font-size: 29px; font-weight: 500; line-height: 1.25; color: #221933; white-space: nowrap; }
+    .s2gt-strike {
+      position: absolute; right: -4px; left: -4px; top: 54%; height: 3px; border-radius: 2px;
+      background: #918aa3; transform-origin: 100% 50%;
+    }
+    .s2gt-rmeta { display: flex; align-items: center; gap: 16px; font-size: 22px; }
+    .s2gt-ctag {
+      display: inline-flex; align-items: center; gap: 8px; padding: 3px 14px; border-radius: 999px;
+      font-size: 21px; font-weight: 600; color: #5d5470;
+    }
+    .s2gt-ctag i { display: block; width: 12px; height: 12px; border-radius: 50%; }
+    .s2gt-due { color: #918aa3; font-weight: 500; }
+    .s2gt-due.is-today { color: #6d00cc; font-weight: 600; }
+    .s2gt-flag { display: block; width: 24px; height: 24px; }
+    .s2gt-del { width: 40px; height: 40px; flex-shrink: 0; color: #c9c3d4; display: grid; place-items: center; }
+    .s2gt-del svg { width: 24px; height: 24px; }
+
+    .s2gt-divider {
+      position: absolute; left: 18px; right: 18px; top: 350px; height: 56px;
+      display: flex; align-items: center; gap: 24px; color: #918aa3; font-size: 24px; font-weight: 500;
+    }
+    .s2gt-dline { flex: 1; height: 2px; background: #e5cffa; }
+    #s2-gantt-todos-dline-r { transform-origin: 0% 50%; }
+    #s2-gantt-todos-dline-l { transform-origin: 100% 50%; }
+
+    .s2gt-cursor {
+      position: absolute; left: 0; top: 0; z-index: 8; width: 56px; height: 64px;
+      transform-origin: 7px 4px;
+      filter: drop-shadow(0 0 9px rgba(165, 24, 219, 0.95)) drop-shadow(0 6px 10px rgba(20, 5, 43, 0.35));
+      opacity: 0;
+    }
+    .s2gt-cursor svg { display: block; width: 56px; height: 64px; }
+    .s2gt-click {
+      position: absolute; left: 822px; top: 392px; width: 60px; height: 60px; z-index: 7;
+      border-radius: 50%; border: 4px solid #a518db; opacity: 0;
+    }
+    .s2gt-pfield {
+      position: absolute; left: 852px; top: 422px; width: 0; height: 0; z-index: 6;
+      filter: drop-shadow(0 0 5px rgba(109, 0, 204, 0.75));
+    }
+    .s2gt-particle {
+      position: absolute; left: 0; top: 0;
+      clip-path: polygon(50% 0%, 61% 39%, 100% 50%, 61% 61%, 50% 100%, 39% 61%, 0% 50%, 39% 39%);
+      opacity: 0;
+    }
+  </style>
+
+  <div id="root" data-composition-id="s2-gantt-todos" data-width="1080" data-height="1920">
+    <div id="s2-gantt-todos-bg" class="clip" data-start="0" data-duration="7" data-track-index="0">
+      <div id="s2-gantt-todos-glow-a" class="s2gt-glow"></div><div id="s2-gantt-todos-glow-b" class="s2gt-glow"></div>
+      <div id="s2-gantt-todos-floor" class="s2gt-glow"></div><div id="s2-gantt-todos-amb"></div>
+    </div>
+
+    <div id="s2-gantt-todos-stage" class="clip" data-start="0" data-duration="7" data-track-index="1">
+      <div id="s2-gantt-todos-winglow"></div>
+      <div id="s2-gantt-todos-win">
+        <!-- gantt page = the camera world -->
+        <div id="s2-gantt-todos-world" class="s2gt-screen">
+          <div id="s2-gantt-todos-top-a" class="s2gt-topbar"></div>
+          <div class="s2gt-content">
+            <div class="s2gt-toolbar">
+              <div class="s2gt-monthnav"><div id="s2-gantt-todos-mprev" class="s2gt-mbtn"></div><div class="s2gt-mlabel">אוקטובר 2026</div><div id="s2-gantt-todos-mnext" class="s2gt-mbtn"></div></div>
+              <div class="s2gt-spacer"></div>
+              <div id="s2-gantt-todos-filter" class="s2gt-filter"><span class="s2gt-fdots"><i style="background:#eab308"></i><i style="background:#ec4899"></i><i style="background:#8b5cf6"></i></span><span>כל הלקוחות</span></div>
+            </div>
+            <div class="s2gt-gcard"><div id="s2-gantt-todos-grid" class="s2gt-gantt"></div></div>
+            <div id="s2-gantt-todos-legend" class="s2gt-legend"></div>
+          </div>
+          <div id="s2-gantt-todos-nav-a" class="s2gt-nav"></div>
+        </div>
+
+        <!-- tasks page -->
+        <div id="s2-gantt-todos-tasks" class="s2gt-screen">
+          <div id="s2-gantt-todos-top-b" class="s2gt-topbar"></div>
+          <div class="s2gt-content">
+            <div id="s2-gantt-todos-thead" class="s2gt-thead">
+              <div class="s2gt-summary">
+                <span class="s2gt-num"><span id="s2-gantt-todos-num-open" class="s2gt-numcol"><span>4</span><span>3</span></span></span>
+                משימות פתוחות ·
+                <span class="s2gt-num"><span id="s2-gantt-todos-num-today" class="s2gt-numcol"><span>2</span><span>1</span></span></span>
+                להיום
+              </div>
+              <div class="s2gt-spacer"></div>
+              <div class="s2gt-toggle"><div class="s2gt-tbtn is-on">רשימה</div><div class="s2gt-tbtn">לוח שנה</div></div>
+            </div>
+            <div id="s2-gantt-todos-urgent" class="s2gt-card">
+              <div id="s2-gantt-todos-ulabel" class="s2gt-ulabel"><span>דחוף היום</span></div>
+              <div class="s2gt-ulist">
+                <div class="s2gt-uitem"><i></i><span id="s2-gantt-todos-utext1" class="s2gt-utext">לאשר טיוטה לסטודיו לוטוס<span id="s2-gantt-todos-ustrike1" class="s2gt-strike"></span></span></div>
+                <div class="s2gt-uitem"><i></i><span class="s2gt-utext">לתזמן רילס למאפיית השקד</span></div>
+              </div>
+            </div>
+            <div id="s2-gantt-todos-list" class="s2gt-card">
+              <div class="s2gt-divider"><div id="s2-gantt-todos-dline-r" class="s2gt-dline"></div><span id="s2-gantt-todos-dtext">בוצעו</span><div id="s2-gantt-todos-dline-l" class="s2gt-dline"></div></div>
+            </div>
+          </div>
+          <div id="s2-gantt-todos-nav-b" class="s2gt-nav"></div>
+          <i id="s2-gantt-todos-click" class="s2gt-click"></i>
+          <div id="s2-gantt-todos-pfield" class="s2gt-pfield"></div>
+          <div id="s2-gantt-todos-cursor" class="s2gt-cursor"><svg viewBox="0 0 40 46"><path d="M5 3 L5 37 L13.5 29.5 L19 42 L25 39.5 L19.5 27 L31 27 Z" fill="#ffffff" stroke="#6d00cc" stroke-width="2.4" stroke-linejoin="round"/></svg></div>
+        </div>
+
+        <div id="s2-gantt-todos-flash"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    const byId = (s) => document.getElementById("s2-gantt-todos-" + s);
+    const mk = (tag, cls, parent) => { const el = document.createElement(tag); if (cls) el.className = cls; if (parent) parent.appendChild(el); return el; };
+    // seeded PRNG (mulberry32) — every particle / sparkle derives from it
+    function mulberry32(a) {
+      return function () { a |= 0; a = (a + 0x6d2b79f5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+    }
+    const rand = mulberry32(20261015);
+
+    // ---- shared dashboard chrome (icons = karnidashbord index.html strokes) ----
+    const ICON = {
+      search: '<circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/>',
+      bell: '<path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>',
+      home: '<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>',
+      todo: '<path d="M9 6h11"/><path d="M9 12h11"/><path d="M9 18h11"/><path d="M4 6l1 1 2-2"/><path d="M4 12l1 1 2-2"/><path d="M4 18l1 1 2-2"/>',
+      track: '<rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/>',
+      plan: '<rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>',
+      write: '<path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/>',
+      next: '<path d="M9 6l6 6-6 6"/>', prev: '<path d="M15 6l-6 6 6 6"/>', down: '<path d="M6 9l6 6 6-6"/>', x: '<path d="M18 6 6 18"/><path d="M6 6l12 12"/>',
+      flame: '<path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.07-2.14-.22-4.05 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.15.43-2.29 1-3a2.5 2.5 0 0 0 2.5 2.5z"/>',
+    };
+    const svg = (k, attrs) => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ' + (attrs || "") + ">" + ICON[k] + "</svg>";
+    const flag = (c, f) => '<svg class="s2gt-flag" viewBox="0 0 24 24" fill="none" stroke="' + c + '" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z" fill="' + f + '"/><line x1="4" y1="22" x2="4" y2="15"/></svg>';
+    const topbar = (el, title) => { el.innerHTML = '<div class="s2gt-ttitle">' + title + '</div><div class="s2gt-spacer"></div><div class="s2gt-search">' + svg("search") + '<span>חיפוש…</span></div><div class="s2gt-bell">' + svg("bell") + '<i class="s2gt-badge"></i></div>'; };
+    const NAV = [["home", "בית"], ["todo", "משימות"], ["track", "מעקב"], ["plan", "תכנון"], ["write", "כתיבה"]];
+    const navBar = (el, active, idPre) => NAV.forEach(([k, label]) => {
+      const it = mk("div", "s2gt-navi" + (k === active ? " is-active" : ""), el);
+      if (idPre) it.id = idPre + k;
+      if (idPre && k === "todo") it.innerHTML = '<i id="' + idPre + 'todo-glow" class="s2gt-navglow"></i><i id="' + idPre + 'todo-pill" class="s2gt-navpill" style="opacity:0"></i><i id="' + idPre + 'todo-ripple" class="s2gt-navripple"></i>';
+      else if (k === active) it.innerHTML = '<i ' + (idPre ? 'id="' + idPre + k + '-pill" ' : "") + 'class="s2gt-navpill"></i>';
+      it.insertAdjacentHTML("beforeend", svg(k) + "<span>" + label + "</span>");
+    });
+    topbar(byId("top-a"), "תכנון חודשי");
+    topbar(byId("top-b"), "משימות");
+    navBar(byId("nav-a"), "plan", "s2-gantt-todos-nav-");
+    navBar(byId("nav-b"), "todo", null);
+    byId("mprev").innerHTML = svg("next", 'stroke-width="2.4"');
+    byId("mnext").innerHTML = svg("prev", 'stroke-width="2.4"');
+    byId("filter").insertAdjacentHTML("beforeend", svg("down", 'stroke-width="2.4"'));
+    byId("ulabel").insertAdjacentHTML("afterbegin", svg("flame"));
+
+    // ---- ambient background: slow glow drift + seeded twinkling sparkles ----
+    tl.fromTo(byId("glow-a"), { x: 0, y: 0 }, { x: 90, y: 60, duration: 7, ease: "sine.inOut" }, 0);
+    tl.fromTo(byId("glow-b"), { x: 0, y: 0 }, { x: -80, y: -40, duration: 7, ease: "sine.inOut" }, 0);
+    const AMB_COLORS = ["#ffffff", "#c9a8f5", "#e5cffa", "#ffffff", "#a518db"];
+    const ambs = [];
+    for (let i = 0; i < 12; i++) {
+      const el = mk("i", "s2gt-amb", byId("amb"));
+      const size = 10 + rand() * 16;
+      Object.assign(el.style, { left: (40 + rand() * 1000).toFixed(1) + "px", top: (1640 + rand() * 230).toFixed(1) + "px", width: size.toFixed(1) + "px", height: size.toFixed(1) + "px", background: AMB_COLORS[i % 5] });
+      ambs.push({ el, freq: 0.35 + rand() * 0.5, phase: rand(), peak: 0.45 + rand() * 0.45 });
+    }
+    const amb = { t: 0 }, renderAmb = () => ambs.forEach((s) => {
+      const o = Math.max(0, Math.sin(2 * Math.PI * (amb.t * s.freq + s.phase)));
+      s.el.style.opacity = (o * o * s.peak).toFixed(3);
+      s.el.style.transform = "scale(" + (0.55 + 0.55 * o).toFixed(3) + ") rotate(" + (amb.t * 30 * (s.freq - 0.6)).toFixed(1) + "deg)";
+    });
+    renderAmb();
+    tl.fromTo(amb, { t: 0 }, { t: 7, duration: 7, ease: "none", onUpdate: renderAmb }, 0);
+
+    // ---- Scene 1 (0.00–0.35): window whip-in ----
+    const win = byId("win");
+    tl.fromTo(win, { scale: 1.06, filter: "blur(10px)" }, { scale: 1, filter: "blur(0px)", duration: 0.35, ease: "expo.out" }, 0);
+    tl.fromTo(byId("winglow"), { opacity: 0 }, { opacity: 0.3, duration: 0.4, ease: "power2.out" }, 0);
+
+    // ---- Scene 2 (0.30–3.40): gantt grid, client column on the right ----
+    const CLIENTS = [["סטודיו לוטוס", "#eab308"], ["מאפיית השקד", "#ec4899"], ["קליניקה ירוקה", "#8b5cf6"], ["בוטיק אלמה", "#14b8a6"], ["גלריה כחולה", "#881337"]];
+    const DAYS = [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19];
+    const DOW = ["ה׳", "ו׳", "ש׳", "א׳", "ב׳", "ג׳", "ד׳", "ה׳", "ו׳", "ש׳", "א׳", "ב׳"];
+    const WEEKEND = [9, 10, 16, 17], TODAY = 15, grid = byId("grid");
+    const headIns = [], clientIns = [], cells = {};
+    const hClientIn = mk("div", "s2gt-cin", mk("div", "s2gt-gc s2gt-hclient s2gt-r-tr", grid));
+    hClientIn.textContent = "לקוח";
+    headIns.push(hClientIn);
+    DAYS.forEach((d, j) => {
+      const c = mk("div", "s2gt-gc s2gt-hday" + (d === TODAY ? " is-today" : "") + (j === 11 ? " s2gt-r-tl" : ""), grid);
+      const inner = mk("div", "s2gt-hin", c);
+      inner.innerHTML = '<span class="s2gt-dow">' + DOW[j] + '</span><span class="s2gt-dnum">' + d + "</span>";
+      headIns.push(inner);
+    });
+    CLIENTS.forEach(([name, color], r) => {
+      const last = r === 4;
+      const inner = mk("div", "s2gt-cin", mk("div", "s2gt-gc s2gt-client" + (last ? " is-last s2gt-r-br" : ""), grid));
+      inner.innerHTML = '<i class="s2gt-swatch" style="background:' + color + '"></i><span>' + name + "</span>";
+      clientIns.push(inner);
+      DAYS.forEach((d, j) => {
+        let cls = "s2gt-gc" + (WEEKEND.indexOf(d) !== -1 ? " is-weekend" : "") + (d === TODAY ? " is-today" : "");
+        if (last) cls += " is-last" + (j === 11 ? " s2gt-r-bl" : "");
+        cells[r + "-" + d] = mk("div", cls, grid);
+      });
+      byId("legend").insertAdjacentHTML("beforeend", '<span class="s2gt-leg"><i style="background:' + color + '"></i>' + name + "</span>");
+    });
+    headIns.forEach((el, i) => tl.fromTo(el, { y: -14, opacity: 0 }, { y: 0, opacity: 1, duration: 0.3, ease: "power3.out" }, 0.1 + i * 0.022));
+    clientIns.forEach((el, i) => tl.fromTo(el, { x: 34, opacity: 0 }, { x: 0, opacity: 1, duration: 0.34, ease: "power3.out" }, 0.18 + i * 0.06));
+
+    // 13 client-coloured dots drop in one after another (0.28s cadence, then 0.18s)
+    const PLAN = [[0, 8], [2, 12], [1, 11], [3, 14], [4, 15], [0, 13], [3, 8], [1, 19], [2, 15], [4, 11], [0, 18], [1, 14], [3, 18]];
+    const DROP_DUR = 0.42, CROSS = DROP_DUR * 0.3125; // back.out(2.2) first reaches the cell at 31.25% of the drop
+    PLAN.forEach(([r, d], i) => {
+      const ring = mk("i", "s2gt-ring", cells[r + "-" + d]);
+      ring.style.borderColor = CLIENTS[r][1];
+      const dot = mk("i", "s2gt-dot", cells[r + "-" + d]);
+      dot.style.background = CLIENTS[r][1];
+      const land = i < 4 ? 0.72 + 0.28 * i : 1.56 + 0.18 * (i - 3);
+      tl.fromTo(dot, { y: -90, opacity: 0 }, { y: 0, opacity: 1, duration: DROP_DUR, ease: "back.out(2.2)" }, land - CROSS);
+      tl.fromTo(dot, { scaleX: 1, scaleY: 1 }, { scaleX: 1.16, scaleY: 0.8, duration: 0.05, ease: "power1.in", immediateRender: false }, land - 0.05);
+      tl.to(dot, { scaleX: 1, scaleY: 1, duration: 0.34, ease: "back.out(3)" }, land);
+      tl.fromTo(ring, { scale: 0.6, opacity: 0 }, { scale: 1.1, opacity: 0.85, duration: 0.06, ease: "none" }, land);
+      tl.to(ring, { scale: 2.5, opacity: 0, duration: 0.5, ease: "power2.out" }, land + 0.06);
+    });
+    // 2.9–3.4 legend fades up under the grid
+    byId("legend").querySelectorAll(".s2gt-leg").forEach((el, i) => tl.fromTo(el, { y: 22, opacity: 0 }, { y: 0, opacity: 1, duration: 0.36, ease: "power3.out" }, 2.9 + i * 0.035));
+
+    // ---- Scene 3 (3.45–4.30): "משימות" lights up, camera pushes in ----
+    tl.to(byId("nav-plan-pill"), { opacity: 0, scale: 0.8, duration: 0.2, ease: "power2.out" }, 3.42);
+    tl.to(byId("nav-plan"), { color: "#797388", duration: 0.18, ease: "power1.out" }, 3.42);
+    tl.fromTo(byId("nav-todo-pill"), { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.3, ease: "back.out(1.8)" }, 3.44);
+    tl.fromTo(byId("nav-todo"), { color: "#797388" }, { color: "#6d00cc", duration: 0.16, ease: "power1.out" }, 3.44);
+    tl.fromTo(byId("nav-todo-glow"), { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1.15, duration: 0.3, ease: "power2.out" }, 3.46);
+    tl.fromTo(byId("nav-todo-ripple"), { opacity: 0, scale: 0.4 }, { opacity: 0.9, scale: 0.6, duration: 0.05, ease: "none" }, 3.48);
+    tl.to(byId("nav-todo-ripple"), { opacity: 0, scale: 2.3, duration: 0.42, ease: "power2.out" }, 3.53);
+    // viewport-change, single wrapper: T = -offset × S. Target = nav item (672, 980); window centre (480, 520).
+    const world = byId("world"), CAM_S = 2.6;
+    tl.fromTo(world, { x: 0, y: 0, scale: 1 }, { x: -(672 - 480) * CAM_S, y: -(980 - 520) * CAM_S, scale: CAM_S, duration: 0.7, ease: "power3.in" }, 3.52);
+    tl.fromTo(world, { filter: "blur(0px)" }, { filter: "blur(8px)", duration: 0.45, ease: "power2.in", immediateRender: false }, 3.75);
+    tl.set(world, { autoAlpha: 0 }, 4.3);
+    // white-lilac flash peaks at 4.15; window glow pulses with it
+    tl.fromTo(byId("flash"), { opacity: 0 }, { opacity: 0.92, duration: 0.17, ease: "power2.in" }, 3.98);
+    tl.to(byId("flash"), { opacity: 0, duration: 0.3, ease: "power2.out" }, 4.15);
+    tl.to(byId("winglow"), { opacity: 0.95, duration: 0.17, ease: "power2.in" }, 3.98);
+    tl.to(byId("winglow"), { opacity: 0.3, duration: 0.5, ease: "power2.out" }, 4.15);
+    // scale-swap: tasks page lands 1.18 → 1, blur 8 → 0, above the outgoing world
+    const tasks = byId("tasks");
+    tl.fromTo(tasks, { opacity: 0 }, { opacity: 1, duration: 0.12, ease: "power1.out" }, 4.15);
+    tl.fromTo(tasks, { scale: 1.18, filter: "blur(8px)" }, { scale: 1, filter: "blur(0px)", duration: 0.32, ease: "expo.out", immediateRender: false }, 4.15);
+
+    // ---- Scene 4 (4.15–7.00): tasks list ----
+    const ROWS = [
+      ["לאשר טיוטה לסטודיו לוטוס", 0, "היום", flag("#d92d20", "rgba(217,45,32,0.18)")],
+      ["לתזמן רילס למאפיית השקד", 1, "היום", flag("#f79009", "rgba(247,144,9,0.18)")],
+      ["לצלם מוצרים חדשים לבוטיק אלמה", 3, "מחר", ""],
+      ["דו״ח חודשי לקליניקה ירוקה", 2, "יום ראשון", ""],
+    ];
+    const TAG_BG = ["rgba(234,179,8,0.16)", "rgba(236,72,153,0.14)", "rgba(139,92,246,0.15)", "rgba(20,184,166,0.15)"];
+    const rows = ROWS.map(([title, c, due, fl], i) => {
+      const row = mk("div", "s2gt-row", byId("list"));
+      const q = (s) => (i === 0 ? ' id="s2-gantt-todos-' + s + '"' : "");
+      row.id = "s2-gantt-todos-row" + i;
+      row.style.top = 18 + i * 114 + "px";
+      row.innerHTML = '<div class="s2gt-check"' + q("check1") + ">" + (i === 0 ? '<i id="s2-gantt-todos-cburst" class="s2gt-cburst"></i>' : "") +
+        '<svg viewBox="0 0 24 24"><circle class="s2gt-ccircle"' + q("ccircle1") + ' cx="12" cy="12" r="9.5"/>' + (i === 0 ? '<path id="s2-gantt-todos-cmark1" class="s2gt-cmark" d="M7.5 12.5l2.8 2.8 6.2-6.6"/>' : "") + "</svg></div>" +
+        '<div class="s2gt-rbody"><span class="s2gt-rtitle"' + q("title1") + ">" + title + (i === 0 ? '<span id="s2-gantt-todos-strike1" class="s2gt-strike"></span>' : "") + "</span>" +
+        '<div class="s2gt-rmeta"' + q("meta1") + '><span class="s2gt-ctag" style="background:' + TAG_BG[c] + '"><i style="background:' + CLIENTS[c][1] + '"></i>' + CLIENTS[c][0] + "</span>" +
+        '<span class="s2gt-due' + (due === "היום" ? " is-today" : "") + '">' + due + "</span>" + fl + "</div></div>" +
+        '<div class="s2gt-del">' + svg("x", 'stroke-width="2.2"') + "</div>";
+      return row;
+    });
+    tl.fromTo(byId("thead"), { y: 24, opacity: 0 }, { y: 0, opacity: 1, duration: 0.4, ease: "expo.out" }, 4.2);
+    tl.fromTo(byId("urgent"), { y: 30, opacity: 0 }, { y: 0, opacity: 1, duration: 0.4, ease: "expo.out" }, 4.25);
+    rows.forEach((row, i) => tl.fromTo(row, { y: 42, opacity: 0 }, { y: 0, opacity: 1, duration: 0.36, ease: "expo.out" }, 4.3 + i * 0.07));
+
+    // tap cursor reaches row 1's check button (centre 852, 422 in tasks space) at 4.90
+    const cursor = byId("cursor");
+    tl.fromTo(cursor, { x: 553, y: 786, opacity: 0 }, { x: 839, y: 426, opacity: 1, duration: 0.45, ease: "power3.out" }, 4.45);
+    tl.fromTo(cursor, { scale: 1 }, { scale: 0.86, duration: 0.08, ease: "power1.in", immediateRender: false }, 5.05);
+    tl.to(cursor, { scale: 1, duration: 0.3, ease: "back.out(2)" }, 5.13);
+    tl.to(cursor, { x: 243, y: 476, duration: 0.5, ease: "power2.inOut" }, 5.58);
+    // press (linear) → release (spring) on the check button
+    const check = byId("check1");
+    tl.fromTo(check, { scale: 1 }, { scale: 0.86, duration: 0.1, ease: "power1.in" }, 5.05);
+    tl.to(check, { scale: 1, duration: 0.45, ease: "back.out(2.2)" }, 5.15);
+    tl.fromTo(byId("click"), { scale: 0.5, opacity: 0 }, { scale: 0.7, opacity: 0.9, duration: 0.04, ease: "none" }, 5.06);
+    tl.to(byId("click"), { scale: 2.1, opacity: 0, duration: 0.42, ease: "power2.out" }, 5.1);
+    // state change at release: circle fills brand, white check draws (svg-path-draw)
+    tl.fromTo(byId("ccircle1"), { fill: "rgba(109,0,204,0)", stroke: "#d9d2e4" }, { fill: "rgba(109,0,204,1)", stroke: "#6d00cc", duration: 0.16, ease: "power1.out" }, 5.13);
+    const mark = byId("cmark1");
+    const markLen = 13.7; // fixed path M7.5 12.5 l2.8 2.8 6.2-6.6 = 3.96 + 9.06 = 13.02 (+5% safety)
+    mark.setAttribute("stroke-dasharray", String(markLen));
+    tl.fromTo(mark, { strokeDashoffset: markLen }, { strokeDashoffset: 0, duration: 0.28, ease: "power2.out" }, 5.18);
+    tl.fromTo(byId("cburst"), { scale: 1, opacity: 0 }, { scale: 3.2, opacity: 0.75, duration: 0.22, ease: "power2.out" }, 5.15);
+    tl.to(byId("cburst"), { scale: 4, opacity: 0, duration: 0.45, ease: "power2.in" }, 5.37);
+    // strike-through draws right → left, title fades to --muted, summary counts 4 → 3 (2 → 1 today)
+    tl.fromTo(byId("strike1"), { scaleX: 0 }, { scaleX: 1, duration: 0.32, ease: "power2.inOut" }, 5.24);
+    tl.fromTo(byId("title1"), { color: "#221933" }, { color: "#918aa3", duration: 0.32, ease: "power1.out" }, 5.24);
+    tl.fromTo(byId("meta1"), { opacity: 1 }, { opacity: 0.55, duration: 0.32, ease: "power1.out" }, 5.28);
+    tl.fromTo(byId("num-open"), { yPercent: 0 }, { yPercent: -50, duration: 0.36, ease: "expo.out" }, 5.3);
+    tl.fromTo(byId("num-today"), { yPercent: 0 }, { yPercent: -50, duration: 0.36, ease: "expo.out" }, 5.38);
+    tl.fromTo(byId("ustrike1"), { scaleX: 0 }, { scaleX: 1, duration: 0.3, ease: "power2.inOut" }, 5.42);
+    tl.fromTo(byId("utext1"), { color: "#221933" }, { color: "#918aa3", duration: 0.3, ease: "power1.out" }, 5.42);
+
+    // particle-burst: 20 seeded four-point sparkles radiate from the check button
+    const P_COLORS = ["#6d00cc", "#c9a8f5", "#a518db", "#ffffff", "#e5cffa"];
+    const parts = [];
+    for (let i = 0; i < 20; i++) {
+      const el = mk("i", "s2gt-particle", byId("pfield"));
+      const size = 14 + rand() * 18;
+      Object.assign(el.style, { width: size.toFixed(1) + "px", height: size.toFixed(1) + "px", marginLeft: (-size / 2).toFixed(1) + "px", marginTop: (-size / 2).toFixed(1) + "px", background: P_COLORS[i % 5] });
+      const angle = ((i + rand() * 0.8) / 20) * Math.PI * 2;
+      const speed = 260 + rand() * 320;
+      parts.push({ el, vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed, spin: (rand() * 2 - 1) * 320 });
+    }
+    const FLIGHT = 0.85, burst = { T: 0 };
+    tl.fromTo(burst, { T: 0 }, {
+      T: 1, duration: FLIGHT, ease: "none",
+      onUpdate: () => {
+        const t = burst.T * FLIGHT;
+        const fade = Math.min(1, (1 - burst.T) / 0.35);
+        const grow = Math.min(1, burst.T * 7);
+        const drag = 1 - 0.45 * t; // pure function of t: decelerating radial flight + light gravity
+        parts.forEach((p) => {
+          p.el.style.transform = "translate(" + (p.vx * t * drag).toFixed(2) + "px," + (p.vy * t * drag + 90 * t * t).toFixed(2) + "px) rotate(" + (p.spin * t).toFixed(1) + "deg) scale(" + grow.toFixed(3) + ")";
+          p.el.style.opacity = burst.T === 0 ? "0" : fade.toFixed(3);
+        });
+      },
+    }, 5.15);
+
+    // 5.90–6.60: checked row slides under a new "בוצעו" divider; the rest close the gap
+    [rows[1], rows[2], rows[3]].forEach((row, i) => tl.to(row, { y: -114, duration: 0.42, ease: "power3.out" }, 5.92 + i * 0.05));
+    tl.to(rows[0], { y: 388, duration: 0.6, ease: "power3.inOut" }, 5.95);
+    tl.to(rows[0], { scale: 1.03, boxShadow: "0 22px 48px rgba(34,25,51,0.2)", duration: 0.25, ease: "power2.out" }, 5.95);
+    tl.to(rows[0], { scale: 1, boxShadow: "0 0px 0px rgba(34,25,51,0)", duration: 0.3, ease: "power2.inOut" }, 6.3);
+    tl.to(rows[0], { backgroundColor: "#fcfaff", borderColor: "#e5cffa", duration: 0.3, ease: "power1.out" }, 6.4);
+    tl.fromTo(byId("list"), { height: 482 }, { height: 528, duration: 0.55, ease: "power3.inOut" }, 5.95);
+    [byId("dline-r"), byId("dline-l")].forEach((el) => tl.fromTo(el, { scaleX: 0 }, { scaleX: 1, duration: 0.36, ease: "power3.out" }, 6.1));
+    tl.fromTo(byId("dtext"), { y: 10, opacity: 0 }, { y: 0, opacity: 1, duration: 0.3, ease: "power2.out" }, 6.12);
+    // gentle settle: the window eases into a slow push that carries into the seam
+    tl.to(win, { scale: 1.012, duration: 0.9, ease: "sine.in" }, 6.1);
+
+    window.__timelines = window.__timelines || {};
+    window.__timelines["s2-gantt-todos"] = tl;
+  </script>
+</template>

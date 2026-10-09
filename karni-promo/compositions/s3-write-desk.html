@@ -1,0 +1,419 @@
+<template>
+  <style>
+    @font-face { font-family: "Rubik"; src: url("assets/fonts/rubik-hebrew-400-normal.woff2") format("woff2"); font-weight: 400; unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F; }
+    @font-face { font-family: "Rubik"; src: url("assets/fonts/rubik-latin-400-normal.woff2") format("woff2"); font-weight: 400; }
+    @font-face { font-family: "Rubik"; src: url("assets/fonts/rubik-hebrew-500-normal.woff2") format("woff2"); font-weight: 500; unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F; }
+    @font-face { font-family: "Rubik"; src: url("assets/fonts/rubik-latin-500-normal.woff2") format("woff2"); font-weight: 500; }
+    @font-face { font-family: "Rubik"; src: url("assets/fonts/rubik-hebrew-600-normal.woff2") format("woff2"); font-weight: 600; unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F; }
+    @font-face { font-family: "Rubik"; src: url("assets/fonts/rubik-latin-600-normal.woff2") format("woff2"); font-weight: 600; }
+    @font-face { font-family: "Rubik"; src: url("assets/fonts/rubik-hebrew-700-normal.woff2") format("woff2"); font-weight: 700; unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F; }
+    @font-face { font-family: "Rubik"; src: url("assets/fonts/rubik-latin-700-normal.woff2") format("woff2"); font-weight: 700; }
+    @font-face { font-family: "Noto Color Emoji"; src: url("assets/fonts/NotoColorEmoji.ttf") format("truetype"); }
+
+    #root {
+      position: absolute; inset: 0; width: 1080px; height: 1920px; overflow: hidden;
+      font-family: "Rubik", "Noto Color Emoji", sans-serif;
+    }
+
+    /* ---------- full-bleed night background (own clip layer) ---------- */
+    #s3-write-desk-bg { position: absolute; inset: 0; overflow: hidden; background: radial-gradient(ellipse at 50% 30%, #2a0a52 0%, #14052b 70%); }
+    .s3wd-glow { position: absolute; border-radius: 50%; }
+    #s3-write-desk-glow-a { left: 300px; top: -40px; width: 900px; height: 900px; background: radial-gradient(circle, rgba(109, 0, 204, 0.5) 0%, rgba(109, 0, 204, 0) 68%); }
+    #s3-write-desk-glow-b { left: -300px; top: 1220px; width: 900px; height: 900px; background: radial-gradient(circle, rgba(165, 24, 219, 0.38) 0%, rgba(165, 24, 219, 0) 68%); }
+    #s3-write-desk-floor { left: 60px; top: 1520px; width: 960px; height: 300px; background: radial-gradient(ellipse at 50% 35%, rgba(109, 0, 204, 0.6) 0%, rgba(109, 0, 204, 0) 70%); }
+    .s3wd-field-layer { position: absolute; left: 0; top: 0; width: 0; height: 0; direction: ltr; }
+    .s3wd-sp { position: absolute; left: 0; top: 0; display: block; opacity: 0; overflow: visible; }
+
+    /* ---------- stage + app window (frame.md app-window spec) ---------- */
+    #s3-write-desk-stage { position: absolute; inset: 0; }
+    #s3-write-desk-winglow {
+      position: absolute; left: 60px; top: 560px; width: 960px; height: 1040px; border-radius: 44px;
+      box-shadow: 0 0 90px 12px rgba(109, 0, 204, 0.75), 0 0 26px rgba(201, 168, 245, 0.55); opacity: 0;
+    }
+    #s3-write-desk-win {
+      position: absolute; left: 60px; top: 560px; width: 960px; height: 1040px; border-radius: 44px;
+      background: #f8f7fb; overflow: hidden;
+      box-shadow: 0 40px 120px rgba(20, 5, 43, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.08), 0 0 80px rgba(109, 0, 204, 0.45);
+    }
+    #s3-write-desk-screen { position: absolute; inset: 0; direction: rtl; color: #221933; background: #f8f7fb; }
+
+    /* topbar (2x .topbar) */
+    .s3wd-topbar {
+      position: absolute; left: 0; right: 0; top: 0; height: 112px; z-index: 5; background: #ffffff;
+      border-bottom: 2px solid #ece8f2; display: flex; align-items: center; gap: 20px; padding: 0 36px;
+    }
+    .s3wd-ttitle { font-size: 34px; font-weight: 700; }
+    .s3wd-spacer { flex: 1; }
+    .s3wd-search {
+      display: flex; align-items: center; gap: 14px; height: 68px; width: 290px; padding: 0 22px;
+      background: #f8f7fb; border: 3px solid #ece8f2; border-radius: 20px; color: #918aa3; font-size: 26px;
+    }
+    .s3wd-search svg { width: 30px; height: 30px; flex-shrink: 0; }
+    .s3wd-bell { position: relative; width: 68px; height: 68px; border-radius: 20px; border: 3px solid #ece8f2; display: grid; place-items: center; color: #5d5470; }
+    .s3wd-bell svg { width: 34px; height: 34px; }
+    .s3wd-badge { position: absolute; top: 9px; right: 11px; width: 18px; height: 18px; border-radius: 50%; background: #6d00cc; border: 3px solid #ffffff; }
+
+    /* mobile nav (2x .mobile-nav) */
+    .s3wd-nav {
+      position: absolute; left: 0; right: 0; bottom: 0; height: 120px; z-index: 5; background: #ffffff;
+      border-top: 2px solid #ece8f2; box-shadow: 0 -8px 40px rgba(34, 25, 51, 0.08);
+      display: grid; grid-template-columns: repeat(5, 1fr); align-items: center;
+    }
+    .s3wd-navi { position: relative; display: flex; flex-direction: column; align-items: center; gap: 6px; color: #918aa3; font-size: 21px; font-weight: 500; }
+    .s3wd-navi svg { position: relative; z-index: 2; width: 42px; height: 42px; }
+    .s3wd-navi span { position: relative; z-index: 2; }
+    .s3wd-navi.is-active { color: #6d00cc; }
+    .s3wd-navpill { position: absolute; left: 50%; top: 50%; width: 140px; height: 100px; margin: -50px 0 0 -70px; border-radius: 28px; background: #f5ebff; z-index: 1; }
+
+    /* page (renderWrite) */
+    #s3-write-desk-page { position: absolute; left: 0; right: 0; top: 112px; height: 808px; overflow: hidden; z-index: 1; }
+    #s3-write-desk-scroll { padding: 20px 36px 0; }
+    .s3wd-head { display: flex; align-items: baseline; gap: 24px; margin-bottom: 14px; white-space: nowrap; }
+    .s3wd-title { font-size: 42px; font-weight: 700; line-height: 1.2; }
+    .s3wd-sub { font-size: 27px; color: #918aa3; }
+    .s3wd-card { background: #ffffff; border: 2px solid #ece8f2; border-radius: 36px; padding: 22px 34px 24px; box-shadow: 0 4px 20px rgba(34, 25, 51, 0.07); }
+    .s3wd-fg { display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px; }
+    .s3wd-label { font-size: 26px; font-weight: 600; color: #5d5470; line-height: 1.25; }
+    .s3wd-input {
+      position: relative; display: flex; align-items: center; gap: 14px; background: #ffffff; border: 3px solid #ece8f2;
+      border-radius: 20px; font-size: 29px; line-height: 1.25; padding: 15px 22px; color: #221933; white-space: nowrap;
+    }
+    .s3wd-cdot { display: block; width: 18px; height: 18px; border-radius: 50%; background: #eab308; flex-shrink: 0; }
+    .s3wd-chev { width: 30px; height: 30px; color: #5d5470; margin-inline-start: auto; }
+    .s3wd-tawrap { position: relative; }
+    #s3-write-desk-taglow { position: absolute; inset: -4px; border-radius: 24px; box-shadow: 0 0 34px 8px rgba(109, 0, 204, 0.6); opacity: 0; }
+    #s3-write-desk-ta { display: block; height: 156px; line-height: 1.45; padding: 12px 22px; white-space: normal; border-color: #6d00cc; box-shadow: 0 0 0 6px #f5ebff; }
+    .s3wd-ph { position: absolute; top: 12px; right: 22px; left: 22px; color: #918aa3; white-space: nowrap; }
+    .s3wd-tatext { position: relative; white-space: pre-wrap; }
+    #s3-write-desk-fglow { position: absolute; left: 0; top: 0; width: 96px; height: 96px; border-radius: 50%; background: radial-gradient(circle, rgba(165, 24, 219, 0.34) 0%, rgba(201, 168, 245, 0.2) 42%, rgba(201, 168, 245, 0) 70%); opacity: 0; }
+    #s3-write-desk-caret { display: inline-block; width: 4px; height: 36px; margin: 0 2px; vertical-align: -7px; border-radius: 2px; background: #6d00cc; }
+    .s3wd-cbrow { display: flex; gap: 48px; padding: 2px 0; }
+    .s3wd-cb { display: flex; align-items: center; gap: 14px; font-size: 29px; }
+    .s3wd-boxwrap { position: relative; width: 40px; height: 40px; flex-shrink: 0; }
+    .s3wd-halo { position: absolute; left: 50%; top: 50%; width: 150px; height: 150px; margin: -75px 0 0 -75px; border-radius: 50%; background: radial-gradient(circle, rgba(109, 0, 204, 0.55) 0%, rgba(165, 24, 219, 0.22) 45%, rgba(165, 24, 219, 0) 70%); opacity: 0; }
+    .s3wd-box { position: absolute; inset: 0; border-radius: 10px; border: 3px solid #cfc6dc; background: #ffffff; }
+    .s3wd-fill { position: absolute; inset: -3px; border-radius: 10px; background: #6d00cc; }
+    .s3wd-tick { position: absolute; inset: -3px; width: 40px; height: 40px; }
+    .s3wd-tick path { fill: none; stroke: #ffffff; stroke-width: 3.2; stroke-linecap: round; stroke-linejoin: round; }
+    .s3wd-glyph { width: 40px; height: 40px; flex-shrink: 0; }
+    .s3wd-btnwrap { position: relative; margin-top: 4px; }
+    #s3-write-desk-btnburst { position: absolute; left: -60px; right: -60px; top: -60px; bottom: -60px; border-radius: 80px; background: radial-gradient(closest-side, rgba(109, 0, 204, 0.75), rgba(165, 24, 219, 0.32) 55%, rgba(165, 24, 219, 0)); opacity: 0; }
+    #s3-write-desk-btn { position: relative; height: 90px; border-radius: 20px; background: #6d00cc; color: #ffffff; font-size: 30px; font-weight: 600; box-shadow: 0 8px 32px rgba(109, 0, 204, 0.38); overflow: hidden; }
+    .s3wd-bl { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; gap: 12px; white-space: nowrap; }
+    .s3wd-bl svg { width: 34px; height: 34px; }
+    .s3wd-bl svg path { fill: none; stroke: #ffffff; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+    #s3-write-desk-bl2, #s3-write-desk-bl3 { opacity: 0; }
+    #s3-write-desk-shim {
+      background: linear-gradient(90deg, rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0.55) 38%, #ffffff 50%, rgba(255, 255, 255, 0.55) 62%, rgba(255, 255, 255, 0.55) 100%);
+      background-size: 300% 100%; background-position: 100% 50%; -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+    #s3-write-desk-sheen { position: absolute; top: -20px; bottom: -20px; left: 0; width: 160px; background: linear-gradient(90deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0)); opacity: 0; }
+
+    /* toast */
+    #s3-write-desk-toastwrap { position: absolute; left: 36px; right: 36px; top: 800px; height: 98px; z-index: 4; }
+    #s3-write-desk-toastglow { position: absolute; inset: 0; border-radius: 28px; box-shadow: 0 0 46px 8px rgba(109, 0, 204, 0.55); opacity: 0; }
+    .s3wd-toast {
+      position: absolute; inset: 0; background: #ffffff; border: 2px solid #e5cffa; border-radius: 28px;
+      box-shadow: 0 14px 40px rgba(34, 25, 51, 0.16); display: flex; align-items: center; gap: 18px; padding: 0 24px; font-size: 28px;
+    }
+    .s3wd-ticon { width: 54px; height: 54px; border-radius: 50%; background: #6d00cc; display: grid; place-items: center; flex-shrink: 0; }
+    .s3wd-ticon svg { width: 32px; height: 32px; }
+    .s3wd-ticon path { fill: none; stroke: #ffffff; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+    .s3wd-ttext { font-weight: 600; white-space: nowrap; }
+    .s3wd-chip { display: inline-flex; align-items: center; gap: 12px; font-size: 25px; font-weight: 600; padding: 6px 20px; border-radius: 999px; background: #f8f7fb; border: 2px solid #ece8f2; color: #5d5470; white-space: nowrap; }
+    .s3wd-chip i { display: block; width: 16px; height: 16px; border-radius: 50%; background: #2970ff; }
+    .s3wd-mglyph { width: 36px; height: 36px; flex-shrink: 0; }
+
+    /* overlay actors (canvas coords) */
+    #s3-write-desk-cursor {
+      position: absolute; left: 0; top: 0; z-index: 10; width: 60px; height: 69px; transform-origin: 7px 4px; opacity: 0;
+      filter: drop-shadow(0 0 10px rgba(165, 24, 219, 0.95)) drop-shadow(0 6px 10px rgba(20, 5, 43, 0.35));
+    }
+    #s3-write-desk-cursor svg { display: block; width: 60px; height: 69px; }
+    .s3wd-ripple { position: absolute; left: 0; top: 0; width: 110px; height: 110px; border-radius: 50%; border: 5px solid #ffffff; box-shadow: 0 0 22px rgba(165, 24, 219, 0.9), inset 0 0 14px rgba(165, 24, 219, 0.55); opacity: 0; z-index: 9; }
+    .s3wd-glowfx { filter: drop-shadow(0 0 6px rgba(109, 0, 204, 0.9)); }
+  </style>
+
+  <div id="root" data-composition-id="s3-write-desk" data-width="1080" data-height="1920">
+    <div id="s3-write-desk-bg" class="clip" data-start="0" data-duration="7" data-track-index="0">
+      <div id="s3-write-desk-glow-a" class="s3wd-glow"></div>
+      <div id="s3-write-desk-glow-b" class="s3wd-glow"></div>
+      <div id="s3-write-desk-floor" class="s3wd-glow"></div>
+      <div id="s3-write-desk-amb" class="s3wd-field-layer"></div>
+    </div>
+
+    <div id="s3-write-desk-stage" class="clip" data-start="0" data-duration="7" data-track-index="1">
+      <div id="s3-write-desk-winglow"></div>
+      <div id="s3-write-desk-win">
+        <div id="s3-write-desk-screen">
+          <div class="s3wd-topbar">
+            <div class="s3wd-ttitle">כתיבת פוסט</div>
+            <div class="s3wd-spacer"></div>
+            <div class="s3wd-search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/></svg><span>חיפוש…</span></div>
+            <div class="s3wd-bell"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><i class="s3wd-badge"></i></div>
+          </div>
+
+          <div id="s3-write-desk-page">
+            <div id="s3-write-desk-scroll">
+              <div id="s3-write-desk-head" class="s3wd-head"><div class="s3wd-title">כתיבת פוסט חדש</div><span class="s3wd-sub">בריף קצר, והמערכת מנסחת עבורך</span></div>
+              <div id="s3-write-desk-card" class="s3wd-card">
+                <div class="s3wd-fg"><div class="s3wd-label">לקוח</div>
+                  <div class="s3wd-input"><i class="s3wd-cdot"></i><span>סטודיו לוטוס</span><svg class="s3wd-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></div></div>
+                <div class="s3wd-fg"><div class="s3wd-label">נושא הפוסט</div><div class="s3wd-input">סדנת יוגה בזריחה</div></div>
+                <div class="s3wd-fg"><div class="s3wd-label">בריף / נקודות עיקריות</div>
+                  <div class="s3wd-tawrap"><i id="s3-write-desk-taglow"></i>
+                    <div id="s3-write-desk-ta" class="s3wd-input"><i id="s3-write-desk-fglow"></i><div id="s3-write-desk-ph" class="s3wd-ph">מה חשוב שיהיה בפוסט? נקודה בכל שורה.</div><div class="s3wd-tatext"><span id="s3-write-desk-text"></span><i id="s3-write-desk-caret"></i></div></div></div></div>
+                <div class="s3wd-fg"><div class="s3wd-label">פלטפורמות לפרסום</div>
+                  <div class="s3wd-cbrow">
+                    <div class="s3wd-cb"><span id="s3-write-desk-bw-fb" class="s3wd-boxwrap"><i id="s3-write-desk-halo-fb" class="s3wd-halo"></i><i id="s3-write-desk-box-fb" class="s3wd-box"></i><i id="s3-write-desk-fill-fb" class="s3wd-fill"></i><svg class="s3wd-tick" viewBox="0 0 24 24"><path id="s3-write-desk-tick-fb" d="M6 12.5l4 4 8-8.5"/></svg></span>
+                      <svg id="s3-write-desk-gl-fb" class="s3wd-glyph" viewBox="0 0 24 24"><circle cx="12" cy="12" r="12" fill="#1877f2"/><path d="M13.4 21v-7.6h2.5l.4-2.9h-2.9V8.7c0-.8.3-1.4 1.4-1.4h1.6V4.7c-.3 0-1.2-.1-2.3-.1-2.3 0-3.8 1.4-3.8 3.9v2h-2.5v2.9h2.5V21z" fill="#ffffff"/></svg><span>פייסבוק</span></div>
+                    <div class="s3wd-cb"><span id="s3-write-desk-bw-ig" class="s3wd-boxwrap"><i id="s3-write-desk-halo-ig" class="s3wd-halo"></i><i id="s3-write-desk-box-ig" class="s3wd-box"></i><i id="s3-write-desk-fill-ig" class="s3wd-fill"></i><svg class="s3wd-tick" viewBox="0 0 24 24"><path id="s3-write-desk-tick-ig" d="M6 12.5l4 4 8-8.5"/></svg></span>
+                      <svg id="s3-write-desk-gl-ig" class="s3wd-glyph" viewBox="0 0 24 24"><defs><linearGradient id="s3-write-desk-igg" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#f9a341"/><stop offset="0.5" stop-color="#d6336c"/><stop offset="1" stop-color="#8b3fd9"/></linearGradient></defs><rect width="24" height="24" rx="6.5" fill="url(#s3-write-desk-igg)"/><rect x="5.3" y="5.3" width="13.4" height="13.4" rx="4" fill="none" stroke="#ffffff" stroke-width="1.9"/><circle cx="12" cy="12" r="3.2" fill="none" stroke="#ffffff" stroke-width="1.9"/><circle cx="16.4" cy="7.6" r="1.05" fill="#ffffff"/></svg><span>אינסטגרם</span></div>
+                  </div></div>
+                <div class="s3wd-btnwrap"><i id="s3-write-desk-btnburst"></i>
+                  <div id="s3-write-desk-btn"><i id="s3-write-desk-sheen"></i>
+                    <span id="s3-write-desk-bl1" class="s3wd-bl"><span>✨</span><span>צרי לי פוסט</span></span>
+                    <span id="s3-write-desk-bl2" class="s3wd-bl"><span id="s3-write-desk-shim">יוצרת…</span></span>
+                    <span id="s3-write-desk-bl3" class="s3wd-bl"><svg viewBox="0 0 24 24"><path id="s3-write-desk-okmark" d="M5 12.5l4.5 4.5L19 7.5"/></svg><span>הפוסט מוכן</span></span>
+                  </div></div>
+              </div>
+            </div>
+          </div>
+
+          <div id="s3-write-desk-sfield" class="s3wd-field-layer s3wd-glowfx" style="z-index: 3"></div>
+          <div id="s3-write-desk-bfield-fb" class="s3wd-field-layer s3wd-glowfx" style="z-index: 3"></div>
+          <div id="s3-write-desk-bfield-ig" class="s3wd-field-layer s3wd-glowfx" style="z-index: 3"></div>
+
+          <div id="s3-write-desk-toastwrap"><i id="s3-write-desk-toastglow"></i>
+            <div class="s3wd-toast">
+              <span id="s3-write-desk-ticon" class="s3wd-ticon"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>
+              <span class="s3wd-ttext">נוצר ותוזמן · ראשון 18:00</span><span class="s3wd-spacer"></span>
+              <span id="s3-write-desk-chip" class="s3wd-chip"><i></i>מתוזמן</span>
+              <svg id="s3-write-desk-mfb" class="s3wd-mglyph" viewBox="0 0 24 24"><circle cx="12" cy="12" r="12" fill="#1877f2"/><path d="M13.4 21v-7.6h2.5l.4-2.9h-2.9V8.7c0-.8.3-1.4 1.4-1.4h1.6V4.7c-.3 0-1.2-.1-2.3-.1-2.3 0-3.8 1.4-3.8 3.9v2h-2.5v2.9h2.5V21z" fill="#ffffff"/></svg>
+              <svg id="s3-write-desk-mig" class="s3wd-mglyph" viewBox="0 0 24 24"><rect width="24" height="24" rx="6.5" fill="url(#s3-write-desk-igg)"/><rect x="5.3" y="5.3" width="13.4" height="13.4" rx="4" fill="none" stroke="#ffffff" stroke-width="1.9"/><circle cx="12" cy="12" r="3.2" fill="none" stroke="#ffffff" stroke-width="1.9"/><circle cx="16.4" cy="7.6" r="1.05" fill="#ffffff"/></svg>
+            </div>
+          </div>
+
+          <div class="s3wd-nav">
+            <div class="s3wd-navi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>בית</span></div>
+            <div class="s3wd-navi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6h11"/><path d="M9 12h11"/><path d="M9 18h11"/><path d="M4 6l1 1 2-2"/><path d="M4 12l1 1 2-2"/><path d="M4 18l1 1 2-2"/></svg><span>משימות</span></div>
+            <div class="s3wd-navi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg><span>מעקב</span></div>
+            <div class="s3wd-navi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span>תכנון</span></div>
+            <div class="s3wd-navi is-active"><i class="s3wd-navpill"></i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg><span>כתיבה</span></div>
+          </div>
+        </div>
+      </div>
+
+      <i id="s3-write-desk-rp1" class="s3wd-ripple"></i><i id="s3-write-desk-rp2" class="s3wd-ripple"></i><i id="s3-write-desk-rp3" class="s3wd-ripple"></i>
+      <div id="s3-write-desk-cfield" class="s3wd-field-layer s3wd-glowfx" style="z-index: 9"></div>
+      <div id="s3-write-desk-cursor"><svg viewBox="0 0 40 46"><path d="M5 3 L5 37 L13.5 29.5 L19 42 L25 39.5 L19.5 27 L31 27 Z" fill="#ffffff" stroke="#6d00cc" stroke-width="2.4" stroke-linejoin="round"/></svg></div>
+    </div>
+  </div>
+
+  <script>
+    window.__timelines = window.__timelines || {};
+    const tl = gsap.timeline({ paused: true });
+    const $ = (s) => document.getElementById("s3-write-desk-" + s);
+    function mulberry32(a) {
+      return function () {
+        a |= 0; a = (a + 0x6d2b79f5) | 0;
+        let t = Math.imul(a ^ (a >>> 15), 1 | a);
+        t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+        return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+      };
+    }
+    const rand = mulberry32(11072026);
+    const smooth = (a, b, x) => { const k = Math.min(1, Math.max(0, (x - a) / (b - a))); return k * k * (3 - 2 * k); };
+
+    // ---- measured layout constants (window px; app window origin = canvas 60,560) ----
+    const WIN_X = 60, WIN_Y = 560;
+    const FX = [859,848,841,823,807,796,777,770,763,756,743,725,718,702,691,676,669,651,633,626,619,598,582,563,556,538,523,516,498,480,859,848,841,823,804,787,780,762,755,742,724,717,702,685,666,648,641,626,619,601,859,848,841,824,806,784,777,759,747,729,711,704,689,678,662,641,623,616,598,591,573,552,536,529,512];            // caret x for each typed state n = 0..TEXT.length (RTL: shrinks as lines grow leftward)
+    const FY = [549, 591, 633];            // caret centre y per textarea line
+    const BOX_FB = [868, 747], BOX_IG = [622, 747];  // checkbox centres
+    const BTN = [540, 1388];          // button centre (canvas)
+    const SCROLL = 121;               // content scroll when the toast arrives
+
+    // ---- 4-point sparkle pools (seeded) ----
+    const STAR = "M12 0C12.9 7.1 16.9 11.1 24 12C16.9 12.9 12.9 16.9 12 24C11.1 16.9 7.1 12.9 0 12C7.1 11.1 11.1 7.1 12 0Z";
+    const PAL = ["#6d00cc", "#a518db", "#c9a8f5", "#ffffff"];
+    function makePool(field, n, colors, smin, smax) {
+      let html = ""; const sizes = [];
+      for (let i = 0; i < n; i++) {
+        const s = smin + rand() * (smax - smin); sizes.push(s);
+        html += '<svg class="s3wd-sp" viewBox="0 0 24 24" style="width:' + s.toFixed(1) + "px;height:" + s.toFixed(1) + "px;fill:" + colors[i % colors.length] + '"><path d="' + STAR + '"/></svg>';
+      }
+      field.innerHTML = html;
+      return Array.from(field.children).map((el, i) => ({ el, s: sizes[i] }));
+    }
+    function put(p, x, y, sc, rot, op) {
+      p.el.style.transform = "translate(" + (x - p.s / 2).toFixed(1) + "px," + (y - p.s / 2).toFixed(1) + "px) rotate(" + rot.toFixed(1) + "deg) scale(" + Math.max(0, sc).toFixed(3) + ")";
+      p.el.style.opacity = Math.max(0, op).toFixed(3);
+    }
+    // particle-burst: radial dot burst, pure ballistic function of the driver T (ease none)
+    function burst(field, n, at, o) {
+      const ps = makePool(field, n, o.colors, o.smin, o.smax).map((p, i) => {
+        const a = o.a0 + ((i + rand() * 0.75) / n) * o.span, v = o.vmin + rand() * (o.vmax - o.vmin);
+        return Object.assign(p, { vx: Math.cos(a) * v, vy: Math.sin(a) * v, spin: (rand() * 2 - 1) * 260 });
+      });
+      const d = { T: 0 };
+      const draw = () => {
+        const t = d.T * o.dur, fade = Math.min(1, (1 - d.T) / 0.4), grow = Math.min(1, d.T * 6), k = 1 - (0.45 * t) / o.dur;
+        ps.forEach((p) => put(p, p.vx * t * k, p.vy * t * k + 0.5 * o.g * t * t, grow * (0.7 + 0.3 * fade), p.spin * t, d.T === 0 ? 0 : fade));
+      };
+      draw();
+      tl.fromTo(d, { T: 0 }, { T: 1, duration: o.dur, ease: "none", onUpdate: draw, immediateRender: false }, at);
+    }
+
+    // ---- discrete-text-sequence: per-keystroke states, seeded human cadence, 0.62 → 3.42 s ----
+    const TEXT = "• סדנת יוגה בזריחה, שבת 07:00\n• מתאים גם למתחילים\n• 20% הנחה לנרשמים השבוע";
+    const T0 = 0.62, T1 = 3.42;
+    const cum = [0];
+    for (let k = 1; k < TEXT.length; k++) {
+      let dd = 0.75 + rand() * 0.5;
+      if (TEXT[k - 1] === " ") dd *= 1.45;
+      if (TEXT[k - 1] === "\n") dd += 2.4;
+      cum.push(cum[k - 1] + dd);
+    }
+    const SEQ = cum.map((c) => T0 + ((T1 - T0) * c) / cum[cum.length - 1]); // SEQ[k] = time char k appears
+    const typedAt = (t) => { for (let k = SEQ.length - 1; k >= 0; k--) if (t >= SEQ[k]) return k + 1; return 0; };
+    const LINE_OF = []; for (let n = 0, l = 0; n <= TEXT.length; n++) { LINE_OF.push(l); if (TEXT[n] === "\n") l++; }
+    const NUMSEG = [[TEXT.indexOf("07:00"), TEXT.indexOf("07:00") + 5], [TEXT.indexOf("20%"), TEXT.indexOf("20%") + 3]];
+    const textEl = $("text"), caretEl = $("caret"), phEl = $("ph");
+    let shownN = -1;
+
+    // sparkle stream shed from the typing frontier (pool of 12, ~8 alive)
+    const sPool = makePool($("sfield"), 14, PAL, 12, 26);
+    const SPAWN = [];
+    for (let k = 0; 0.64 + k * 0.08 < 3.42; k++) {
+      const s = 0.64 + k * 0.08, n = Math.max(1, typedAt(s));
+      SPAWN.push({ s, life: 0.6 + rand() * 0.3, x: FX[n] + (rand() * 2 - 1) * 6, y: FY[LINE_OF[n]] + (rand() * 2 - 1) * 9,
+        a: -Math.PI / 2 + (rand() * 2 - 1) * 1.35, d: 30 + rand() * 60, rot: (rand() * 2 - 1) * 140 });
+    }
+    function drawStream(t) {
+      sPool.forEach((p, j) => {
+        let on = null;
+        for (let k = j; k < SPAWN.length; k += sPool.length) if (t >= SPAWN[k].s && t < SPAWN[k].s + SPAWN[k].life) on = SPAWN[k];
+        if (!on) { p.el.style.opacity = "0"; return; }
+        const q = (t - on.s) / on.life, e = 1 - (1 - q) * (1 - q), tw = Math.sin(Math.PI * q);
+        put(p, on.x + Math.cos(on.a) * on.d * e, on.y + Math.sin(on.a) * on.d * e, tw, on.rot * q, Math.min(1, tw * 1.5));
+      });
+    }
+
+    // ambient twinkles in the decorative bottom band
+    const amb = makePool($("amb"), 10, ["#ffffff", "#c9a8f5", "#e5cffa", "#a518db"], 10, 24).map((p) =>
+      Object.assign(p, { x: 40 + rand() * 1000, y: 1640 + rand() * 230, f: 0.35 + rand() * 0.5, ph: rand(), pk: 0.45 + rand() * 0.45 }));
+
+    // one master clock: typing + caret + sparkle stream + textarea glow breathe + toast glow + ambient
+    const clock = { t: 0 };
+    function drawClock() {
+      const t = clock.t, n = typedAt(t);
+      if (n !== shownN) { textEl.textContent = TEXT.slice(0, n); shownN = n; }
+      phEl.style.opacity = n > 0 ? "0" : "1";
+      const typing = SEQ.some((s) => s <= t && t - s < 0.2);
+      const blinkOn = Math.sin((2 * Math.PI * 12 * t) / 7) > 0;
+      caretEl.style.opacity = t >= 0.35 && t < 3.62 && (typing || blinkOn) ? "1" : "0";
+      const inNum = NUMSEG.some((g) => n > g[0] && n <= g[1]);
+      caretEl.style.background = inNum ? "#a518db" : "#6d00cc";
+      drawStream(t);
+      const fl = LINE_OF[n], fe = smooth(0.5, 0.75, t) * (1 - smooth(3.4, 3.7, t));
+      $("fglow").style.transform = "translate(" + (FX[n] - 75 - 48) + "px," + (FY[fl] - 517 - 48) + "px)";
+      $("fglow").style.opacity = fe.toFixed(3);
+      const env = smooth(0.55, 0.95, t) * (1 - smooth(3.45, 3.9, t));
+      $("taglow").style.opacity = (env * (0.3 + 0.08 * Math.sin((2 * Math.PI * (t - 0.95)) / 1.3))).toFixed(3);
+      const tg = smooth(6.1, 6.6, t);
+      $("toastglow").style.opacity = (tg * (0.3 + 0.07 * Math.sin((2 * Math.PI * Math.max(0, t - 6.6)) / 1.6))).toFixed(3);
+      amb.forEach((p) => { const w = Math.max(0, Math.sin(2 * Math.PI * (t * p.f + p.ph))); put(p, p.x, p.y, 0.55 + 0.55 * w, t * 30 * (p.f - 0.6), w * w * p.pk); });
+    }
+    drawClock();
+    tl.fromTo(clock, { t: 0 }, { t: 7, duration: 7, ease: "none", onUpdate: drawClock }, 0);
+
+    // ---- Scene 1 (0.00–0.35): whip-in ----
+    const win = $("win");
+    tl.fromTo(win, { scale: 1.06, filter: "blur(10px)" }, { scale: 1, filter: "blur(0px)", duration: 0.35, ease: "expo.out" }, 0);
+    tl.fromTo($("winglow"), { opacity: 0 }, { opacity: 0.3, duration: 0.4, ease: "power2.out" }, 0);
+    tl.fromTo($("glow-a"), { x: 0, y: 0 }, { x: -90, y: 70, duration: 7, ease: "sine.inOut" }, 0);
+    tl.fromTo($("glow-b"), { x: 0, y: 0 }, { x: 90, y: -50, duration: 7, ease: "sine.inOut" }, 0);
+
+    // ---- Scene 2 (0.05–0.64): the form builds in (under the root seam flash) ----
+    tl.fromTo($("head"), { y: 26, opacity: 0 }, { y: 0, opacity: 1, duration: 0.34, ease: "expo.out" }, 0.05);
+    tl.fromTo($("card"), { y: 40, opacity: 0 }, { y: 0, opacity: 1, duration: 0.38, ease: "expo.out" }, 0.08);
+    Array.from($("card").children).forEach((el, i) => {
+      tl.fromTo(el, { y: 24, opacity: 0 }, { y: 0, opacity: 1, duration: 0.32, ease: "expo.out" }, 0.12 + i * 0.05);
+    });
+
+    // ---- Scene 3 (3.62): typing done, focus leaves the textarea ----
+    tl.fromTo($("ta"), { borderColor: "#6d00cc", boxShadow: "0 0 0 6px #f5ebff" }, { borderColor: "#ece8f2", boxShadow: "0 0 0 0px #f5ebff", duration: 0.3, ease: "power2.out", immediateRender: false }, 3.62);
+
+    // ---- Scene 4 (3.65 / 4.00): platforms light up ----
+    function checkOn(id, at, center) {
+      const tick = $("tick-" + id), len = tick.getTotalLength() * 1.05;
+      tick.setAttribute("stroke-dasharray", len.toFixed(2));
+      tl.fromTo(tick, { strokeDashoffset: len }, { strokeDashoffset: 0, duration: 0.24, ease: "power2.out" }, at + 0.1);
+      tl.fromTo($("fill-" + id), { scale: 0, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.34, ease: "back.out(2.6)" }, at);
+      tl.fromTo($("bw-" + id), { scale: 1 }, { scale: 0.84, duration: 0.06, ease: "power1.in" }, at - 0.02);
+      tl.to($("bw-" + id), { scale: 1, duration: 0.42, ease: "back.out(3)" }, at + 0.04);
+      tl.fromTo($("halo-" + id), { scale: 0.4, opacity: 0 }, { scale: 1.2, opacity: 1, duration: 0.22, ease: "power2.out" }, at + 0.02);
+      tl.to($("halo-" + id), { scale: 1, opacity: 0.35, duration: 0.5, ease: "power2.inOut" }, at + 0.24);
+      tl.fromTo($("gl-" + id), { opacity: 0.45, filter: "grayscale(1)" }, { opacity: 1, filter: "grayscale(0)", duration: 0.3, ease: "power1.out" }, at + 0.06);
+      tl.fromTo($("gl-" + id), { scale: 1 }, { scale: 1.16, duration: 0.1, ease: "power2.out" }, at + 0.06);
+      tl.to($("gl-" + id), { scale: 1, duration: 0.36, ease: "back.out(2.5)" }, at + 0.16);
+      const f = $("bfield-" + id);
+      f.style.left = center[0] + "px"; f.style.top = center[1] + "px";
+      burst(f, 10, at + 0.04, { colors: PAL, smin: 11, smax: 21, a0: -Math.PI, span: Math.PI * 2, vmin: 150, vmax: 280, g: 160, dur: 0.62 });
+    }
+    checkOn("fb", 3.65, BOX_FB);
+    checkOn("ig", 4.0, BOX_IG);
+
+    // ---- Scene 5 (4.50–5.50): cursor glides in, click at 5.00 ----
+    const cur = $("cursor");
+    tl.fromTo(cur, { x: 110 - 7, y: 1700 - 4, opacity: 0 }, { x: BTN[0] - 7, y: BTN[1] - 4, opacity: 1, duration: 0.45, ease: "power3.out" }, 4.5);
+    tl.fromTo(cur, { scale: 1 }, { scale: 0.84, duration: 0.08, ease: "power1.in" }, 5.0);
+    tl.to(cur, { scale: 1, duration: 0.36, ease: "back.out(2)" }, 5.08);
+    tl.to(cur, { x: BTN[0] - 110, y: BTN[1] + 90, opacity: 0, duration: 0.3, ease: "power2.in" }, 5.36);
+    const btn = $("btn");
+    tl.fromTo(btn, { scale: 1, boxShadow: "0 8px 32px rgba(109,0,204,0.38)" }, { scale: 0.94, boxShadow: "0 2px 8px rgba(109,0,204,0.3)", duration: 0.08, ease: "power1.in" }, 5.0);
+    tl.to(btn, { scale: 1, boxShadow: "0 10px 44px rgba(109,0,204,0.55)", duration: 0.5, ease: "back.out(2.2)" }, 5.08);
+    tl.fromTo($("btnburst"), { scale: 0.85, opacity: 0 }, { scale: 1.15, opacity: 0.95, duration: 0.22, ease: "power2.out" }, 5.06);
+    tl.to($("btnburst"), { scale: 1, opacity: 0.35, duration: 0.6, ease: "power2.inOut" }, 5.28);
+    tl.to($("winglow"), { opacity: 0.8, duration: 0.14, ease: "power2.out" }, 5.04);
+    tl.to($("winglow"), { opacity: 0.38, duration: 0.7, ease: "power2.inOut" }, 5.18);
+    // cursor-click-ripple: 3 white rings, pure function of one driver (seek-safe)
+    const rings = [$("rp1"), $("rp2"), $("rp3")];
+    rings.forEach((r) => { r.style.left = BTN[0] - 55 + "px"; r.style.top = BTN[1] - 55 + "px"; });
+    const rp = { T: 0 };
+    const drawRings = () => rings.forEach((r, i) => {
+      const q = (rp.T * 0.75 - i * 0.08) / 0.56;
+      const on = rp.T > 0 && q > 0 && q < 1;
+      r.style.opacity = on ? (0.95 * Math.pow(1 - q, 1.3)).toFixed(3) : "0";
+      r.style.transform = "scale(" + (on ? 0.3 + 2.7 * (1 - Math.pow(1 - q, 2)) : 0.3).toFixed(3) + ")";
+    });
+    drawRings();
+    tl.fromTo(rp, { T: 0 }, { T: 1, duration: 0.75, ease: "none", onUpdate: drawRings, immediateRender: false }, 5.03);
+    const cf = $("cfield");
+    cf.style.left = BTN[0] + "px"; cf.style.top = BTN[1] + "px";
+    burst(cf, 24, 5.03, { colors: PAL, smin: 14, smax: 30, a0: -Math.PI, span: Math.PI * 2, vmin: 280, vmax: 580, g: 360, dur: 0.82 });
+
+    // ---- Scene 6 (5.50–7.00): label scale-swaps, toast slides up, glow breathes ----
+    tl.to($("bl1"), { scale: 0.7, opacity: 0, duration: 0.18, ease: "power2.in" }, 5.5);
+    tl.fromTo($("bl2"), { scale: 0.7, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.34, ease: "back.out(1.8)" }, 5.58);
+    const shim = { p: 0 };
+    tl.fromTo(shim, { p: 0 }, { p: 1, duration: 0.42, ease: "none", immediateRender: false, onUpdate: () => { $("shim").style.backgroundPosition = (1 - (shim.p % 1)) * 100 + "% 50%"; } }, 5.53);
+    tl.to($("bl2"), { scale: 0.7, opacity: 0, duration: 0.16, ease: "power2.in" }, 5.95);
+    tl.fromTo($("bl3"), { scale: 0.7, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.42, ease: "back.out(1.8)" }, 6.03);
+    const ok = $("okmark"), okLen = ok.getTotalLength() * 1.05;
+    ok.setAttribute("stroke-dasharray", okLen.toFixed(2));
+    tl.fromTo(ok, { strokeDashoffset: okLen }, { strokeDashoffset: 0, duration: 0.3, ease: "power2.out" }, 6.12);
+    tl.fromTo($("sheen"), { x: 960, opacity: 0 }, { x: -200, opacity: 1, duration: 0.7, ease: "none" }, 6.08);
+    tl.to($("sheen"), { opacity: 0, duration: 0.15, ease: "power1.in" }, 6.63);
+    tl.fromTo($("scroll"), { y: 0 }, { y: -SCROLL, duration: 0.5, ease: "power3.out" }, 6.05);
+    tl.fromTo($("toastwrap"), { y: 150, opacity: 0 }, { y: 0, opacity: 1, duration: 0.45, ease: "expo.out" }, 6.05);
+    tl.fromTo($("ticon"), { scale: 0.4 }, { scale: 1, duration: 0.4, ease: "back.out(2.4)" }, 6.12);
+    tl.fromTo($("chip"), { x: -24, opacity: 0 }, { x: 0, opacity: 1, duration: 0.32, ease: "expo.out" }, 6.16);
+    tl.fromTo([$("mfb"), $("mig")], { scale: 0.3, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.3, ease: "back.out(2.4)", stagger: 0.06 }, 6.2);
+    const br = { p: 0 }, bb = $("btnburst");
+    tl.fromTo(br, { p: 0 }, { p: Math.PI * 2 * 0.5, duration: 1.1, ease: "none", immediateRender: false, onUpdate: () => { bb.style.opacity = (0.35 + 0.07 * Math.sin(br.p)).toFixed(3); } }, 5.9);
+    tl.to(win, { scale: 1.012, duration: 0.8, ease: "sine.in" }, 6.2);
+
+    window.__timelines["s3-write-desk"] = tl;
+  </script>
+</template>

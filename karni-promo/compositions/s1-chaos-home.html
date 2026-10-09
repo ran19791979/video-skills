@@ -1,0 +1,399 @@
+<template>
+  <style>
+    @font-face { font-family: "Rubik"; src: url("assets/fonts/rubik-hebrew-400-normal.woff2") format("woff2"); font-weight: 400; unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F; }
+    @font-face { font-family: "Rubik"; src: url("assets/fonts/rubik-latin-400-normal.woff2") format("woff2"); font-weight: 400; }
+    @font-face { font-family: "Rubik"; src: url("assets/fonts/rubik-hebrew-500-normal.woff2") format("woff2"); font-weight: 500; unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F; }
+    @font-face { font-family: "Rubik"; src: url("assets/fonts/rubik-latin-500-normal.woff2") format("woff2"); font-weight: 500; }
+    @font-face { font-family: "Rubik"; src: url("assets/fonts/rubik-hebrew-600-normal.woff2") format("woff2"); font-weight: 600; unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F; }
+    @font-face { font-family: "Rubik"; src: url("assets/fonts/rubik-latin-600-normal.woff2") format("woff2"); font-weight: 600; }
+    @font-face { font-family: "Rubik"; src: url("assets/fonts/rubik-hebrew-700-normal.woff2") format("woff2"); font-weight: 700; unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F; }
+    @font-face { font-family: "Rubik"; src: url("assets/fonts/rubik-latin-700-normal.woff2") format("woff2"); font-weight: 700; }
+    @font-face { font-family: "Rubik"; src: url("assets/fonts/rubik-hebrew-800-normal.woff2") format("woff2"); font-weight: 800; unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F; }
+    @font-face { font-family: "Rubik"; src: url("assets/fonts/rubik-latin-800-normal.woff2") format("woff2"); font-weight: 800; }
+    @font-face { font-family: "Noto Color Emoji"; src: url("assets/fonts/NotoColorEmoji.ttf") format("truetype"); }
+    #root { position: absolute; inset: 0; width: 1080px; height: 1920px; overflow: hidden; font-family: "Rubik", "Noto Color Emoji", sans-serif; }
+    #root * { box-sizing: border-box; }
+    #s1-chaos-home-bg { position: absolute; inset: 0; overflow: hidden; background: radial-gradient(ellipse at 50% 30%, #2A0A52 0%, #14052B 70%); }
+    .s1-chaos-home-glow { position: absolute; width: 900px; height: 900px; border-radius: 50%; background: radial-gradient(circle, rgba(109, 0, 204, 0.5) 0%, rgba(109, 0, 204, 0.18) 42%, rgba(109, 0, 204, 0) 70%); opacity: 0.5; }
+    #s1-chaos-home-glow-a { left: 90px; top: 700px; }
+    #s1-chaos-home-glow-b { left: -300px; top: -160px; width: 760px; height: 760px; }
+    #s1-chaos-home-glow-c { left: 560px; top: 1240px; width: 700px; height: 700px; }
+    #s1-chaos-home-halo { position: absolute; left: 90px; top: 150px; width: 900px; height: 560px; border-radius: 50%; background: radial-gradient(ellipse 50% 50% at 50% 50%, rgba(201, 168, 245, 0.32) 0%, rgba(165, 24, 219, 0.2) 40%, rgba(109, 0, 204, 0) 72%); opacity: 0; }
+    #s1-chaos-home-stage { position: absolute; inset: 0; }
+    #s1-chaos-home-chaos { position: absolute; inset: 0; transform-origin: 50% 45%; }
+    .s1-chaos-home-world { position: absolute; inset: 0; }
+    .s1-chaos-home-gridnoise { position: absolute; inset: -40px; background-image:
+    linear-gradient(rgba(201, 196, 214, 0.07) 2px, transparent 2px), linear-gradient(90deg, rgba(201, 196, 214, 0.07) 2px, transparent 2px); background-size: 72px 54px; }
+    #s1-chaos-home-ghosts, #s1-chaos-home-slices { position: absolute; inset: 0; pointer-events: none; }
+    #s1-chaos-home-ghosts > .s1-chaos-home-world { mix-blend-mode: screen; opacity: 0.6; }
+    #s1-chaos-home-ghost-m { filter: url(#s1-chaos-home-tint-m); }
+    #s1-chaos-home-ghost-c { filter: url(#s1-chaos-home-tint-c); }
+    .s1-chaos-home-sheet-pos { position: absolute; width: 760px; transform-origin: 50% 50%; }
+    .s1-chaos-home-sheet { position: relative; width: 760px; background: #FFFFFF; border: 2px solid #CFCBD8; border-radius: 12px; overflow: hidden; box-shadow: 0 24px 60px rgba(8, 2, 20, 0.55); direction: rtl; }
+    .s1-chaos-home-sheet-bar { height: 52px; background: #E9E7EE; border-bottom: 2px solid #D5D2DC; display: flex; align-items: center; justify-content: space-between; padding: 0 18px; color: #6B6676; font-size: 22px; font-weight: 500; }
+    .s1-chaos-home-dots { display: flex; gap: 8px; direction: ltr; }
+    .s1-chaos-home-dots i { display: block; width: 14px; height: 14px; border-radius: 50%; background: #C4C0CC; }
+    .s1-chaos-home-grid { display: grid; grid-template-columns: 44px 168px 196px 104px 128px 120px; grid-template-rows: 56px; grid-auto-rows: 54px; }
+    .s1-chaos-home-th, .s1-chaos-home-td { display: flex; align-items: center; padding: 0 10px; border-inline-start: 2px solid #DEDBE4; border-bottom: 2px solid #DEDBE4; font-size: 23px; color: #4B4757; white-space: nowrap; overflow: hidden; }
+    .s1-chaos-home-th { background: #EEEDF1; font-weight: 600; color: #3E3A48; }
+    .s1-chaos-home-rn { background: #F3F2F5; color: #9A96A4; font-size: 20px; justify-content: center; padding: 0; }
+    .s1-chaos-home-hot { background: #FBE1DE; color: #B42318; font-weight: 600; }
+    .s1-chaos-home-scribble { position: absolute; overflow: visible; }
+    .s1-chaos-home-sticky-pos { position: absolute; width: 290px; height: 290px; }
+    .s1-chaos-home-sticky { position: relative; width: 290px; height: 290px; display: flex; align-items: center; justify-content: center; padding: 54px 26px 28px; border-radius: 6px 6px 22px 6px; box-shadow: 0 18px 34px rgba(8, 2, 20, 0.5), inset 0 -14px 24px rgba(40, 30, 60, 0.06); direction: rtl; text-align: center; }
+    .s1-chaos-home-sticky-text { font-size: 38px; font-weight: 700; line-height: 1.22; color: #2E2838; }
+    .s1-chaos-home-sticky-red .s1-chaos-home-sticky-text { color: #D92D20; font-size: 44px; }
+    .s1-chaos-home-pin { position: absolute; top: 16px; left: 50%; margin-left: -13px; width: 26px; height: 26px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #FF8A80 0%, #D92D20 55%, #8E1B13 100%); box-shadow: 0 4px 6px rgba(0, 0, 0, 0.35); }
+    .s1-chaos-home-toast-pos { position: absolute; left: 392px; width: 648px; height: 112px; }
+    .s1-chaos-home-toast { width: 648px; height: 112px; display: flex; align-items: center; gap: 22px; padding: 0 24px; background: #FFFFFF; border-radius: 30px; box-shadow: 0 16px 40px rgba(8, 2, 20, 0.5); direction: rtl; }
+    .s1-chaos-home-app-ic { position: relative; flex: 0 0 68px; width: 68px; height: 68px; border-radius: 18px; background: #8E8A99; color: #FFFFFF; display: grid; place-items: center; }
+    .s1-chaos-home-app-badge, .s1-chaos-home-bell-count { position: absolute; background: #D92D20; color: #FFFFFF; font-weight: 700; border-radius: 999px; display: grid; place-items: center; border: 3px solid #FFFFFF; font-variant-numeric: tabular-nums; }
+    .s1-chaos-home-app-badge { top: -12px; left: -12px; min-width: 34px; height: 34px; padding: 0 6px; font-size: 18px; }
+    .s1-chaos-home-toast-txt { flex: 1; min-width: 0; }
+    .s1-chaos-home-toast-app { display: flex; justify-content: space-between; font-size: 22px; font-weight: 600; color: #6B6676; }
+    .s1-chaos-home-toast-when { font-weight: 400; color: #9A96A4; font-size: 20px; }
+    .s1-chaos-home-toast-msg { font-size: 30px; font-weight: 600; color: #2B2735; margin-top: 2px; white-space: nowrap; }
+    .s1-chaos-home-bell-pos { position: absolute; left: 92px; top: 600px; width: 150px; height: 150px; }
+    .s1-chaos-home-bell { position: relative; width: 150px; height: 150px; border-radius: 50%; background: #F1F0F4; color: #5F5A6B; display: grid; place-items: center; box-shadow: 0 18px 40px rgba(8, 2, 20, 0.55); transform-origin: 50% 12%; }
+    .s1-chaos-home-bell-count { top: -8px; left: -22px; min-width: 76px; height: 64px; padding: 0 12px; font-size: 32px; border-width: 5px; }
+    #s1-chaos-home-scrim { position: absolute; left: -120px; top: 170px; width: 1320px; height: 430px; background: radial-gradient(ellipse 50% 50% at 50% 50%, rgba(20, 5, 43, 0.94) 0%, rgba(20, 5, 43, 0.82) 48%, rgba(20, 5, 43, 0) 100%); }
+    #s1-chaos-home-home { position: absolute; inset: 0; }
+    #s1-chaos-home-window { position: absolute; left: 60px; top: 560px; width: 960px; height: 1040px; border-radius: 44px; overflow: hidden; background: #F8F7FB; box-shadow: 0 40px 120px rgba(20, 5, 43, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.08), 0 0 80px rgba(109, 0, 204, 0.45); direction: rtl; color: #221933; }
+    .s1-chaos-home-topbar { position: absolute; top: 0; left: 0; right: 0; height: 112px; background: #FFFFFF; border-bottom: 2px solid #ECE8F2; display: flex; align-items: center; gap: 24px; padding: 0 40px; z-index: 3; }
+    .s1-chaos-home-topbar-title { font-size: 34px; font-weight: 700; }
+    .s1-chaos-home-spacer { flex: 1; }
+    .s1-chaos-home-search { display: flex; align-items: center; gap: 14px; width: 300px; height: 72px; padding: 0 22px; background: #F8F7FB; border: 3px solid #ECE8F2; border-radius: 20px; color: #918AA3; font-size: 27px; }
+    .s1-chaos-home-icon-btn { position: relative; width: 80px; height: 80px; border-radius: 20px; border: 3px solid #ECE8F2; background: #FFFFFF; color: #5D5470; display: grid; place-items: center; }
+    .s1-chaos-home-top-badge { position: absolute; top: -10px; left: -10px; min-width: 36px; height: 36px; padding: 0 8px; border-radius: 999px; background: #6D00CC; color: #FFFFFF; font-size: 22px; font-weight: 700; display: grid; place-items: center; border: 4px solid #FFFFFF; }
+    .s1-chaos-home-content { position: absolute; top: 112px; left: 0; right: 0; bottom: 120px; padding: 36px 36px 0; overflow: hidden; }
+    .s1-chaos-home-greet { margin-bottom: 30px; }
+    .s1-chaos-home-greet h1 { margin: 0 0 8px; font-size: 54px; font-weight: 700; line-height: 1.15; }
+    .s1-chaos-home-greet p { margin: 0; font-size: 28px; color: #918AA3; line-height: 1.35; }
+    .s1-chaos-home-wave { display: inline-block; font-family: "Noto Color Emoji", sans-serif; font-weight: 400; transform-origin: 70% 80%; }
+    .s1-chaos-home-kpi-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; margin-bottom: 24px; }
+    .s1-chaos-home-kpi { position: relative; background: #FFFFFF; border: 2px solid #ECE8F2; border-radius: 36px; box-shadow: 0 2px 6px rgba(34, 25, 51, 0.06); padding: 22px 20px; display: flex; align-items: center; gap: 16px; }
+    .s1-chaos-home-ring-wrap { position: relative; flex: 0 0 136px; width: 136px; height: 136px; }
+    .s1-chaos-home-ring { position: relative; display: block; z-index: 1; font-family: "Rubik", sans-serif; font-variant-numeric: tabular-nums; }
+    .s1-chaos-home-ring-glow { position: absolute; left: -50px; top: -50px; width: 236px; height: 236px; border-radius: 50%; background: radial-gradient(circle, rgba(109, 0, 204, 0.42) 0%, rgba(165, 24, 219, 0.2) 45%, rgba(109, 0, 204, 0) 70%); opacity: 0; }
+    .s1-chaos-home-kpi-icon { position: relative; z-index: 1; width: 136px; height: 136px; border-radius: 50%; background: #F5EBFF; color: #6D00CC; display: grid; place-items: center; }
+    .s1-chaos-home-pfield { position: absolute; left: 50%; top: 50%; width: 0; height: 0; z-index: 2; }
+    .s1-chaos-home-spark { position: absolute; left: 0; top: 0; clip-path: polygon(50% 0%, 61% 39%, 100% 50%, 61% 61%, 50% 100%, 39% 61%, 0% 50%, 39% 39%); opacity: 0; }
+    .s1-chaos-home-kpi-body { min-width: 0; flex: 1; }
+    .s1-chaos-home-kpi-num { font-size: 60px; font-weight: 700; line-height: 1.05; color: #221933; font-variant-numeric: tabular-nums; }
+    .s1-chaos-home-kpi-label { font-size: 26px; font-weight: 600; color: #5D5470; margin-top: 4px; white-space: nowrap; }
+    .s1-chaos-home-kpi-sub { font-size: 21px; color: #918AA3; margin-top: 4px; line-height: 1.3; white-space: nowrap; }
+    .s1-chaos-home-card { background: #FFFFFF; border: 2px solid #ECE8F2; border-radius: 36px; box-shadow: 0 4px 20px rgba(34, 25, 51, 0.07); padding: 30px 32px 10px; }
+    .s1-chaos-home-card-title { margin: 0 0 6px; font-size: 31px; font-weight: 700; display: flex; align-items: center; gap: 14px; }
+    .s1-chaos-home-card-title .s1-chaos-home-emo { font-family: "Noto Color Emoji", sans-serif; font-weight: 400; font-size: 30px; }
+    .s1-chaos-home-todo { display: flex; align-items: center; gap: 20px; padding: 22px 16px 22px 8px; border-bottom: 2px solid #ECE8F2; }
+    .s1-chaos-home-todo:last-child { border-bottom: none; }
+    .s1-chaos-home-chip { display: inline-flex; align-items: center; gap: 12px; font-size: 24px; font-weight: 600; padding: 6px 18px; border-radius: 999px; background: #F8F7FB; border: 2px solid #ECE8F2; color: #5D5470; white-space: nowrap; }
+    .s1-chaos-home-chip-dot { width: 16px; height: 16px; border-radius: 50%; background: #F79009; flex-shrink: 0; }
+    .s1-chaos-home-t-info { flex: 1; min-width: 0; }
+    .s1-chaos-home-t-title { font-weight: 600; font-size: 29px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .s1-chaos-home-t-meta { font-size: 25px; font-weight: 700; margin-top: 4px; }
+    .s1-chaos-home-btn-approve { display: inline-flex; align-items: center; padding: 14px 24px; font-size: 25px; font-weight: 600; border-radius: 16px; background: rgba(18, 183, 106, 0.12); color: #087443; border: 3px solid rgba(18, 183, 106, 0.4); white-space: nowrap; }
+    .s1-chaos-home-x { color: #918AA3; font-size: 26px; width: 40px; text-align: center; }
+    .s1-chaos-home-nav { position: absolute; left: 0; right: 0; bottom: 0; height: 120px; background: #FFFFFF; border-top: 2px solid #ECE8F2; box-shadow: 0 -8px 40px rgba(34, 25, 51, 0.08); display: flex; justify-content: space-around; align-items: center; padding: 0 12px 6px; z-index: 3; }
+    .s1-chaos-home-nav-item { display: flex; flex-direction: column; align-items: center; gap: 6px; color: #918AA3; font-size: 20px; font-weight: 500; padding: 8px 16px; border-radius: 16px; }
+    .s1-chaos-home-nav-item.s1-chaos-home-active { color: #6D00CC; font-weight: 600; }
+    .s1-chaos-home-twinkle { position: absolute; clip-path: polygon(50% 0%, 61% 39%, 100% 50%, 61% 61%, 50% 100%, 39% 61%, 0% 50%, 39% 39%); opacity: 0; }
+    #s1-chaos-home-twinkles { position: absolute; inset: 0; }
+    #s1-chaos-home-flash { position: absolute; inset: 0; background: #FFFFFF; opacity: 0; pointer-events: none; }
+  </style>
+  <div id="root" data-composition-id="s1-chaos-home" data-width="1080" data-height="1920">
+    <div id="s1-chaos-home-bg" class="clip" data-start="0" data-duration="4" data-track-index="0">
+      <div class="s1-chaos-home-glow" id="s1-chaos-home-glow-a"></div>
+      <div class="s1-chaos-home-glow" id="s1-chaos-home-glow-b"></div>
+      <div class="s1-chaos-home-glow" id="s1-chaos-home-glow-c"></div>
+    </div>
+    <div id="s1-chaos-home-stage" class="clip" data-start="0" data-duration="4" data-track-index="1">
+      <svg width="0" height="0" style="position:absolute" aria-hidden="true"><filter id="s1-chaos-home-tint-m" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values="0.28 0.28 0.28 0 0  0.08 0.08 0.08 0 0  0.27 0.27 0.27 0 0  0 0 0 1 0"/></filter><filter id="s1-chaos-home-tint-c" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values="0.18 0.18 0.18 0 0  0.28 0.28 0.28 0 0  0.33 0.33 0.33 0 0  0 0 0 1 0"/></filter></svg>
+      <div id="s1-chaos-home-chaos">
+        <div class="s1-chaos-home-world" id="s1-chaos-home-world">
+          <div class="s1-chaos-home-gridnoise"></div>
+          <div class="s1-chaos-home-sheet-pos" style="left:-10px;top:600px;transform:rotate(-7deg)"><div class="s1-chaos-home-sheet" data-sheet="sheet-a"><div class="s1-chaos-home-sheet-bar"><span class="s1-chaos-home-sheet-file">תוכנית_תוכן_סופי_v7.xlsx</span><span class="s1-chaos-home-dots"><i></i><i></i><i></i></span></div><div class="s1-chaos-home-grid"><div class="s1-chaos-home-th">#</div><div class="s1-chaos-home-th">לקוח</div><div class="s1-chaos-home-th">פוסט</div><div class="s1-chaos-home-th">תאריך</div><div class="s1-chaos-home-th">סטטוס</div><div class="s1-chaos-home-th">הערות</div><div class="s1-chaos-home-td s1-chaos-home-rn">2</div><div class="s1-chaos-home-td">סטודיו לוטוס</div><div class="s1-chaos-home-td">רילס יוגה בוקר</div><div class="s1-chaos-home-td">12.10</div><div class="s1-chaos-home-td s1-chaos-home-hot">באיחור!</div><div class="s1-chaos-home-td">לשלוח שוב</div><div class="s1-chaos-home-td s1-chaos-home-rn">3</div><div class="s1-chaos-home-td">מאפיית השקד</div><div class="s1-chaos-home-td">פוסט חלות</div><div class="s1-chaos-home-td">13.10</div><div class="s1-chaos-home-td">???</div><div class="s1-chaos-home-td">איפה הבריף</div><div class="s1-chaos-home-td s1-chaos-home-rn">4</div><div class="s1-chaos-home-td">קליניקה ירוקה</div><div class="s1-chaos-home-td">טיפים לשינה</div><div class="s1-chaos-home-td">14.10</div><div class="s1-chaos-home-td">לבדוק</div><div class="s1-chaos-home-td"></div><div class="s1-chaos-home-td s1-chaos-home-rn">5</div><div class="s1-chaos-home-td">בוטיק אלמה</div><div class="s1-chaos-home-td">השקת קולקציה</div><div class="s1-chaos-home-td">12.10</div><div class="s1-chaos-home-td">טיוטה 3</div><div class="s1-chaos-home-td">לא אושר</div><div class="s1-chaos-home-td s1-chaos-home-rn">6</div><div class="s1-chaos-home-td">גלריה כחולה</div><div class="s1-chaos-home-td">תערוכה חדשה</div><div class="s1-chaos-home-td">15.10</div><div class="s1-chaos-home-td s1-chaos-home-hot">באיחור!</div><div class="s1-chaos-home-td">???</div><div class="s1-chaos-home-td s1-chaos-home-rn">7</div><div class="s1-chaos-home-td">סטודיו לוטוס</div><div class="s1-chaos-home-td">סטורי סדנה</div><div class="s1-chaos-home-td">16.10</div><div class="s1-chaos-home-td">לבדוק</div><div class="s1-chaos-home-td s1-chaos-home-hot">דחוף!!</div><div class="s1-chaos-home-td s1-chaos-home-rn">8</div><div class="s1-chaos-home-td">מאפיית השקד</div><div class="s1-chaos-home-td">מבצע סופ״ש</div><div class="s1-chaos-home-td">17.10</div><div class="s1-chaos-home-td">???</div><div class="s1-chaos-home-td"></div><div class="s1-chaos-home-td s1-chaos-home-rn">9</div><div class="s1-chaos-home-td">בוטיק אלמה</div><div class="s1-chaos-home-td">ריל מאחורי הקלעים</div><div class="s1-chaos-home-td">18.10</div><div class="s1-chaos-home-td">טיוטה 3</div><div class="s1-chaos-home-td">?</div></div><svg class="s1-chaos-home-scribble" style="left:102px;top:148px" width="164" height="82" viewBox="0 0 164 82"><path d="M20 44 C 14 20, 62 8, 98 10 C 140 12, 160 30, 150 52 C 140 72, 80 78, 46 70 C 18 64, 6 46, 24 26 C 34 16, 60 12, 82 13" fill="none" stroke="#D92D20" stroke-width="5" stroke-linecap="round"/></svg></div></div>
+          <div class="s1-chaos-home-sheet-pos" style="left:300px;top:1150px;transform:rotate(5deg)"><div class="s1-chaos-home-sheet" data-sheet="sheet-b"><div class="s1-chaos-home-sheet-bar"><span class="s1-chaos-home-sheet-file">לוח_פרסומים (2).xlsx</span><span class="s1-chaos-home-dots"><i></i><i></i><i></i></span></div><div class="s1-chaos-home-grid"><div class="s1-chaos-home-th">#</div><div class="s1-chaos-home-th">לקוח</div><div class="s1-chaos-home-th">פוסט</div><div class="s1-chaos-home-th">תאריך</div><div class="s1-chaos-home-th">סטטוס</div><div class="s1-chaos-home-th">הערות</div><div class="s1-chaos-home-td s1-chaos-home-rn">2</div><div class="s1-chaos-home-td">גלריה כחולה</div><div class="s1-chaos-home-td">סטורי פתיחה</div><div class="s1-chaos-home-td">11.10</div><div class="s1-chaos-home-td s1-chaos-home-hot">באיחור!</div><div class="s1-chaos-home-td">להתקשר</div><div class="s1-chaos-home-td s1-chaos-home-rn">3</div><div class="s1-chaos-home-td">קליניקה ירוקה</div><div class="s1-chaos-home-td">פוסט המלצות</div><div class="s1-chaos-home-td">12.10</div><div class="s1-chaos-home-td">טיוטה 3</div><div class="s1-chaos-home-td">???</div><div class="s1-chaos-home-td s1-chaos-home-rn">4</div><div class="s1-chaos-home-td">סטודיו לוטוס</div><div class="s1-chaos-home-td">קרוסלה</div><div class="s1-chaos-home-td">13.10</div><div class="s1-chaos-home-td">לבדוק</div><div class="s1-chaos-home-td"></div><div class="s1-chaos-home-td s1-chaos-home-rn">5</div><div class="s1-chaos-home-td">בוטיק אלמה</div><div class="s1-chaos-home-td">סייל סוף עונה</div><div class="s1-chaos-home-td">14.10</div><div class="s1-chaos-home-td">???</div><div class="s1-chaos-home-td">מי מאשר?</div><div class="s1-chaos-home-td s1-chaos-home-rn">6</div><div class="s1-chaos-home-td">מאפיית השקד</div><div class="s1-chaos-home-td">ריל אפייה</div><div class="s1-chaos-home-td">15.10</div><div class="s1-chaos-home-td s1-chaos-home-hot">באיחור!</div><div class="s1-chaos-home-td s1-chaos-home-hot">דחוף</div><div class="s1-chaos-home-td s1-chaos-home-rn">7</div><div class="s1-chaos-home-td">גלריה כחולה</div><div class="s1-chaos-home-td">פוסט אמן</div><div class="s1-chaos-home-td">16.10</div><div class="s1-chaos-home-td">טיוטה 3</div><div class="s1-chaos-home-td"></div><div class="s1-chaos-home-td s1-chaos-home-rn">8</div><div class="s1-chaos-home-td">קליניקה ירוקה</div><div class="s1-chaos-home-td">סטורי שאלות</div><div class="s1-chaos-home-td">17.10</div><div class="s1-chaos-home-td">לבדוק</div><div class="s1-chaos-home-td">?</div></div></div></div>
+          <div class="s1-chaos-home-sheet-pos" style="left:150px;top:-250px;transform:rotate(4deg)"><div class="s1-chaos-home-sheet" data-sheet="sheet-c"><div class="s1-chaos-home-sheet-bar"><span class="s1-chaos-home-sheet-file">מעקב_לקוחות_חדש_חדש.xlsx</span><span class="s1-chaos-home-dots"><i></i><i></i><i></i></span></div><div class="s1-chaos-home-grid"><div class="s1-chaos-home-th">#</div><div class="s1-chaos-home-th">לקוח</div><div class="s1-chaos-home-th">פוסט</div><div class="s1-chaos-home-th">תאריך</div><div class="s1-chaos-home-th">סטטוס</div><div class="s1-chaos-home-th">הערות</div><div class="s1-chaos-home-td s1-chaos-home-rn">2</div><div class="s1-chaos-home-td">בוטיק אלמה</div><div class="s1-chaos-home-td">פוסט סטיילינג</div><div class="s1-chaos-home-td">10.10</div><div class="s1-chaos-home-td s1-chaos-home-hot">באיחור!</div><div class="s1-chaos-home-td">???</div><div class="s1-chaos-home-td s1-chaos-home-rn">3</div><div class="s1-chaos-home-td">סטודיו לוטוס</div><div class="s1-chaos-home-td">ריל נשימות</div><div class="s1-chaos-home-td">11.10</div><div class="s1-chaos-home-td">לבדוק</div><div class="s1-chaos-home-td">לשנות</div><div class="s1-chaos-home-td s1-chaos-home-rn">4</div><div class="s1-chaos-home-td">מאפיית השקד</div><div class="s1-chaos-home-td">פוסט עוגות</div><div class="s1-chaos-home-td">12.10</div><div class="s1-chaos-home-td">???</div><div class="s1-chaos-home-td"></div><div class="s1-chaos-home-td s1-chaos-home-rn">5</div><div class="s1-chaos-home-td">גלריה כחולה</div><div class="s1-chaos-home-td">הזמנה לערב</div><div class="s1-chaos-home-td">13.10</div><div class="s1-chaos-home-td">טיוטה 3</div><div class="s1-chaos-home-td">באיחור</div><div class="s1-chaos-home-td s1-chaos-home-rn">6</div><div class="s1-chaos-home-td">קליניקה ירוקה</div><div class="s1-chaos-home-td">טיפ שבועי</div><div class="s1-chaos-home-td">14.10</div><div class="s1-chaos-home-td s1-chaos-home-hot">באיחור!</div><div class="s1-chaos-home-td">?</div><div class="s1-chaos-home-td s1-chaos-home-rn">7</div><div class="s1-chaos-home-td">סטודיו לוטוס</div><div class="s1-chaos-home-td">סטורי מבצע</div><div class="s1-chaos-home-td">15.10</div><div class="s1-chaos-home-td">לבדוק</div><div class="s1-chaos-home-td"></div></div></div></div>
+          <div class="s1-chaos-home-sticky-pos" style="left:36px;top:1250px;transform:rotate(-8deg)"><div class="s1-chaos-home-sticky" style="background:#EBDDFB"><span class="s1-chaos-home-pin"></span><span class="s1-chaos-home-sticky-text">לשלוח ללוטוס עד 12:00!!</span></div></div>
+          <div class="s1-chaos-home-sticky-pos" style="left:40px;top:20px;transform:rotate(-6deg)"><div class="s1-chaos-home-sticky" style="background:#FFFFFF"><span class="s1-chaos-home-pin"></span><span class="s1-chaos-home-sticky-text">איפה הבריף של השקד?</span></div></div>
+          <div class="s1-chaos-home-sticky-pos" style="left:748px;top:1330px;transform:rotate(7deg)"><div class="s1-chaos-home-sticky" style="background:#E4E2E8"><span class="s1-chaos-home-pin"></span><span class="s1-chaos-home-sticky-text">לתזמן רילס לראשון</span></div></div>
+          <div class="s1-chaos-home-sticky-pos" style="left:742px;top:6px;transform:rotate(8deg)"><div class="s1-chaos-home-sticky" style="background:#FFF4B8"><span class="s1-chaos-home-pin"></span><span class="s1-chaos-home-sticky-text">לא לשכוח אישור לקוח</span></div></div>
+          <div class="s1-chaos-home-sticky-pos" style="left:392px;top:1468px;transform:rotate(-3deg)"><div class="s1-chaos-home-sticky" style="background:#EBDDFB"><span class="s1-chaos-home-pin"></span><span class="s1-chaos-home-sticky-text">סטורי?? רילס??</span></div></div>
+          <div class="s1-chaos-home-sticky-pos" style="left:66px;top:810px;transform:rotate(5deg)"><div class="s1-chaos-home-sticky s1-chaos-home-sticky-red" style="background:#FFFFFF"><span class="s1-chaos-home-pin"></span><span class="s1-chaos-home-sticky-text">דדליין מחר!!!</span></div></div>
+          <div class="s1-chaos-home-bell-pos"><div class="s1-chaos-home-bell"><svg viewBox="0 0 24 24" width="76" height="76" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><span class="s1-chaos-home-bell-count">3</span></div></div>
+          <div class="s1-chaos-home-toast-pos" style="top:1104px"><div class="s1-chaos-home-toast"><div class="s1-chaos-home-app-ic"><svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg><span class="s1-chaos-home-app-badge">23</span></div><div class="s1-chaos-home-toast-txt"><div class="s1-chaos-home-toast-app"><span>WhatsApp</span><span class="s1-chaos-home-toast-when">עכשיו</span></div><div class="s1-chaos-home-toast-msg">23 הודעות חדשות</div></div></div></div>
+          <div class="s1-chaos-home-toast-pos" style="top:978px"><div class="s1-chaos-home-toast"><div class="s1-chaos-home-app-ic"><svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 14"/></svg><span class="s1-chaos-home-app-badge">1</span></div><div class="s1-chaos-home-toast-txt"><div class="s1-chaos-home-toast-app"><span>תזכורת</span><span class="s1-chaos-home-toast-when">עכשיו</span></div><div class="s1-chaos-home-toast-msg">פוסט לא פורסם</div></div></div></div>
+          <div class="s1-chaos-home-toast-pos" style="top:852px"><div class="s1-chaos-home-toast"><div class="s1-chaos-home-app-ic"><svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><polyline points="3 7 12 13 21 7"/></svg><span class="s1-chaos-home-app-badge">9</span></div><div class="s1-chaos-home-toast-txt"><div class="s1-chaos-home-toast-app"><span>מייל</span><span class="s1-chaos-home-toast-when">עכשיו</span></div><div class="s1-chaos-home-toast-msg">איפה הטיוטה?</div></div></div></div>
+          <div class="s1-chaos-home-toast-pos" style="top:726px"><div class="s1-chaos-home-toast"><div class="s1-chaos-home-app-ic"><svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span class="s1-chaos-home-app-badge">3</span></div><div class="s1-chaos-home-toast-txt"><div class="s1-chaos-home-toast-app"><span>יומן</span><span class="s1-chaos-home-toast-when">עכשיו</span></div><div class="s1-chaos-home-toast-msg">3 דדליינים היום</div></div></div></div>
+          <div class="s1-chaos-home-toast-pos" style="top:600px"><div class="s1-chaos-home-toast"><div class="s1-chaos-home-app-ic"><svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><line x1="8" y1="9" x2="16" y2="9"/><line x1="8" y1="13" x2="13" y2="13"/></svg><span class="s1-chaos-home-app-badge">12</span></div><div class="s1-chaos-home-toast-txt"><div class="s1-chaos-home-toast-app"><span>פייסבוק</span><span class="s1-chaos-home-toast-when">עכשיו</span></div><div class="s1-chaos-home-toast-msg">12 תגובות ממתינות</div></div></div></div>
+        </div>
+        <div id="s1-chaos-home-ghosts"></div>
+        <div id="s1-chaos-home-slices"></div>
+      </div>
+      <div id="s1-chaos-home-scrim"></div>
+      <div id="s1-chaos-home-home">
+        <div id="s1-chaos-home-halo"></div>
+        <div id="s1-chaos-home-twinkles"></div>
+        <div id="s1-chaos-home-window">
+          <div class="s1-chaos-home-topbar"><div class="s1-chaos-home-topbar-title">דף הבית</div><div class="s1-chaos-home-spacer"></div><div class="s1-chaos-home-search"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/></svg><span>חיפוש…</span></div><div class="s1-chaos-home-icon-btn"><svg viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><span class="s1-chaos-home-top-badge">3</span></div></div>
+          <div class="s1-chaos-home-content">
+            <div class="s1-chaos-home-greet"><h1 id="s1-chaos-home-hello">שלום, הדס <span class="s1-chaos-home-wave" id="s1-chaos-home-wave">👋</span></h1><p id="s1-chaos-home-date">יום חמישי, 15 באוקטובר · הנה תמונת המצב של הדסק שלך</p></div>
+            <div class="s1-chaos-home-kpi-grid">
+            <div class="s1-chaos-home-kpi" id="s1-chaos-home-kpi-0"><div class="s1-chaos-home-ring-wrap" id="s1-chaos-home-ring-wrap-0"><div class="s1-chaos-home-ring-glow" id="s1-chaos-home-ring-glow-0"></div><svg class="s1-chaos-home-ring" width="136" height="136" viewBox="0 0 136 136"><circle cx="68" cy="68" r="61" fill="none" stroke="#EFE7F8" stroke-width="14"/><circle id="s1-chaos-home-ring-arc-0" cx="68" cy="68" r="61" fill="none" stroke="#6D00CC" stroke-width="14" stroke-linecap="round" transform="rotate(-90 68 68)"/><text id="s1-chaos-home-ring-pct-0" x="50%" y="53%" text-anchor="middle" dominant-baseline="middle" direction="ltr" font-size="30" font-weight="700" fill="#6D00CC">0%</text></svg><div class="s1-chaos-home-pfield" id="s1-chaos-home-pfield-0"></div></div><div class="s1-chaos-home-kpi-body"><div class="s1-chaos-home-kpi-num" id="s1-chaos-home-kpi-num-0">0</div><div class="s1-chaos-home-kpi-label">ממתינים לאישורך</div><div class="s1-chaos-home-kpi-sub">מתוך 21 בתהליך</div></div></div>
+            <div class="s1-chaos-home-kpi" id="s1-chaos-home-kpi-1"><div class="s1-chaos-home-ring-wrap" id="s1-chaos-home-ring-wrap-1"><div class="s1-chaos-home-ring-glow" id="s1-chaos-home-ring-glow-1"></div><svg class="s1-chaos-home-ring" width="136" height="136" viewBox="0 0 136 136"><circle cx="68" cy="68" r="61" fill="none" stroke="#EFE7F8" stroke-width="14"/><circle id="s1-chaos-home-ring-arc-1" cx="68" cy="68" r="61" fill="none" stroke="#6D00CC" stroke-width="14" stroke-linecap="round" transform="rotate(-90 68 68)"/><text id="s1-chaos-home-ring-pct-1" x="50%" y="53%" text-anchor="middle" dominant-baseline="middle" direction="ltr" font-size="30" font-weight="700" fill="#6D00CC">0%</text></svg><div class="s1-chaos-home-pfield" id="s1-chaos-home-pfield-1"></div></div><div class="s1-chaos-home-kpi-body"><div class="s1-chaos-home-kpi-num" id="s1-chaos-home-kpi-num-1">0</div><div class="s1-chaos-home-kpi-label">מתוזמנים לפרסום</div><div class="s1-chaos-home-kpi-sub">הקרוב: 16.10 בשעה 18:00</div></div></div>
+            <div class="s1-chaos-home-kpi" id="s1-chaos-home-kpi-2"><div class="s1-chaos-home-ring-wrap" id="s1-chaos-home-ring-wrap-2"><div class="s1-chaos-home-ring-glow" id="s1-chaos-home-ring-glow-2"></div><svg class="s1-chaos-home-ring" width="136" height="136" viewBox="0 0 136 136"><circle cx="68" cy="68" r="61" fill="none" stroke="#EFE7F8" stroke-width="14"/><circle id="s1-chaos-home-ring-arc-2" cx="68" cy="68" r="61" fill="none" stroke="#6D00CC" stroke-width="14" stroke-linecap="round" transform="rotate(-90 68 68)"/><text id="s1-chaos-home-ring-pct-2" x="50%" y="53%" text-anchor="middle" dominant-baseline="middle" direction="ltr" font-size="30" font-weight="700" fill="#6D00CC">0%</text></svg><div class="s1-chaos-home-pfield" id="s1-chaos-home-pfield-2"></div></div><div class="s1-chaos-home-kpi-body"><div class="s1-chaos-home-kpi-num" id="s1-chaos-home-kpi-num-2">0</div><div class="s1-chaos-home-kpi-label">פורסמו החודש</div><div class="s1-chaos-home-kpi-sub">מתוך 24 בתוכנית החודשית</div></div></div>
+            <div class="s1-chaos-home-kpi" id="s1-chaos-home-kpi-3"><div class="s1-chaos-home-ring-wrap" id="s1-chaos-home-ring-wrap-3"><div class="s1-chaos-home-ring-glow" id="s1-chaos-home-ring-glow-3"></div><div class="s1-chaos-home-kpi-icon"><svg viewBox="0 0 24 24" width="56" height="56" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><div class="s1-chaos-home-pfield" id="s1-chaos-home-pfield-3"></div></div><div class="s1-chaos-home-kpi-body"><div class="s1-chaos-home-kpi-num" id="s1-chaos-home-kpi-num-3">0</div><div class="s1-chaos-home-kpi-label">לקוחות</div><div class="s1-chaos-home-kpi-sub">5 עם תוכן בתהליך</div></div></div>
+            </div>
+            <div class="s1-chaos-home-card" id="s1-chaos-home-card">
+              <h2 class="s1-chaos-home-card-title"><span class="s1-chaos-home-emo">🔔</span>דורש את הטיפול שלך</h2>
+              <div class="s1-chaos-home-todo-list">
+                <div class="s1-chaos-home-todo" id="s1-chaos-home-todo-0" style="border-inline-end:6px solid #14B8A6"><span class="s1-chaos-home-chip"><span class="s1-chaos-home-chip-dot"></span>ממתין לאישור</span><div class="s1-chaos-home-t-info"><div class="s1-chaos-home-t-title">השקת קולקציית סתיו</div><div class="s1-chaos-home-t-meta" style="color:#14B8A6">בוטיק אלמה</div></div><span class="s1-chaos-home-btn-approve">צפי ואשרי</span><span class="s1-chaos-home-x">✕</span></div>
+                <div class="s1-chaos-home-todo" id="s1-chaos-home-todo-1" style="border-inline-end:6px solid #EC4899"><span class="s1-chaos-home-chip"><span class="s1-chaos-home-chip-dot"></span>ממתין לאישור</span><div class="s1-chaos-home-t-info"><div class="s1-chaos-home-t-title">מבצע חלות לשבת</div><div class="s1-chaos-home-t-meta" style="color:#EC4899">מאפיית השקד</div></div><span class="s1-chaos-home-btn-approve">צפי ואשרי</span><span class="s1-chaos-home-x">✕</span></div>
+              </div>
+            </div>
+          </div>
+          <nav class="s1-chaos-home-nav"><div class="s1-chaos-home-nav-item s1-chaos-home-active"><svg viewBox="0 0 24 24" width="42" height="42" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>בית</span></div><div class="s1-chaos-home-nav-item"><svg viewBox="0 0 24 24" width="42" height="42" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6h11"/><path d="M9 12h11"/><path d="M9 18h11"/><path d="M4 6l1 1 2-2"/><path d="M4 12l1 1 2-2"/><path d="M4 18l1 1 2-2"/></svg><span>משימות</span></div><div class="s1-chaos-home-nav-item"><svg viewBox="0 0 24 24" width="42" height="42" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg><span>מעקב</span></div><div class="s1-chaos-home-nav-item"><svg viewBox="0 0 24 24" width="42" height="42" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span>תכנון</span></div><div class="s1-chaos-home-nav-item"><svg viewBox="0 0 24 24" width="42" height="42" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg><span>כתיבה</span></div></nav>
+        </div>
+      </div>
+      <div id="s1-chaos-home-flash"></div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      var P = "s1-chaos-home";
+      var $ = function (n) { return document.getElementById(P + "-" + n); };
+      var tl = gsap.timeline({ paused: true });
+      function mulberry32(a) {
+        return function () {
+          a |= 0; a = (a + 0x6D2B79F5) | 0;
+          var t = Math.imul(a ^ (a >>> 15), 1 | a);
+          t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+          return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+        };
+      }
+      var rnd = mulberry32(20261015);
+      var hash = function (n) { var x = Math.sin(n * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
+      var world = $("world");
+      function cloneWorld(tag) {
+        var cl = world.cloneNode(true);
+        cl.id = P + "-" + tag;
+        cl.querySelectorAll("[id]").forEach(function (n) { n.removeAttribute("id"); });
+        cl.querySelectorAll("." + P + "-bell-count").forEach(function (n) { n.textContent = "99+"; });
+        cl.querySelectorAll("." + P + "-gridnoise").forEach(function (n) { n.remove(); });
+        cl.setAttribute("aria-hidden", "true");
+        return cl;
+      }
+      var ghostHost = $("ghosts"), sliceHost = $("slices");
+      var ghostM = cloneWorld("ghost-m"), ghostC = cloneWorld("ghost-c");
+      ghostHost.appendChild(ghostM); ghostHost.appendChild(ghostC);
+      var BANDS = [[118, 64], [640, 52], [892, 78], [1188, 46], [1420, 70], [1640, 56]];
+      var slices = BANDS.map(function (b, i) {
+        var cl = cloneWorld("slice-" + i);
+        cl.style.clipPath = "inset(" + b[0] + "px 0 " + (1920 - b[0] - b[1]) + "px 0)";
+        sliceHost.appendChild(cl);
+        return cl;
+      });
+      gsap.set([ghostHost, sliceHost], { autoAlpha: 0 });
+      var sheetEls = gsap.utils.toArray("#" + P + "-world ." + P + "-sheet");
+      var sheetFrom = [
+        { x: -1150, y: 80, rotation: -12 },
+        { x: 1150, y: 240, rotation: 12 },
+        { x: -260, y: -760, rotation: -9 },
+      ];
+      sheetEls.forEach(function (sheetEl, i) {
+        tl.fromTo(sheetEl, { x: sheetFrom[i].x, y: sheetFrom[i].y, rotation: sheetFrom[i].rotation },
+          { x: 0, y: 0, rotation: 0, duration: 0.42, ease: "expo.out" }, i * 0.12);
+      });
+      var stickyEls = gsap.utils.toArray("#" + P + "-world ." + P + "-sticky");
+      stickyEls.forEach(function (stickyEl, i) {
+        tl.fromTo(stickyEl, { scale: 0, opacity: 0, rotation: i % 2 ? 14 : -14 },
+          { scale: 1, opacity: 1, rotation: 0, duration: 0.34, ease: "back.out(1.7)" }, 0.25 + i * 0.19);
+      });
+      var bell = document.querySelector("#" + P + "-world ." + P + "-bell");
+      var bellCount = document.querySelector("#" + P + "-world ." + P + "-bell-count");
+      tl.fromTo(bell, { scale: 0, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.3, ease: "back.out(1.8)" }, 0.3);
+      var bc = { n: 3 };
+      tl.fromTo(bc, { n: 3 }, {
+        n: 100, duration: 1.2, ease: "power2.in",
+        onUpdate: function () {
+          var v = Math.round(bc.n);
+          bellCount.textContent = v >= 99 ? "99+" : String(v);
+          var t = tl.time();
+          gsap.set(bell, { rotation: 13 * Math.sin((t - 0.4) * 38) });
+        },
+      }, 0.4);
+      tl.fromTo(bellCount, { scale: 1 }, { scale: 1.25, duration: 0.09, ease: "power2.out", immediateRender: false }, 1.6);
+      tl.to(bellCount, { scale: 1, duration: 0.2, ease: "power2.inOut" }, 1.7);
+      var toastEls = gsap.utils.toArray("#" + P + "-world ." + P + "-toast");
+      var N = toastEls.length, STEP = 126;
+      var TT = [0.4, 0.625, 0.85, 1.075, 1.3];
+      toastEls.forEach(function (toastEl, k) {
+        var slot0 = -(N - 1 - k) * STEP;          // offset that puts toast k in the top slot
+        tl.fromTo(toastEl, { y: slot0 - 130, opacity: 0, scale: 0.96 },
+          { y: slot0, opacity: 1, scale: 1, duration: 0.22, ease: "expo.out" }, TT[k]);
+        for (var j = k + 1; j < N; j++) {
+          tl.fromTo(toastEl, { y: slot0 + (j - k - 1) * STEP }, { y: slot0 + (j - k) * STEP, duration: 0.22, ease: "expo.out", immediateRender: false }, TT[j]);
+        }
+      });
+      var chaos = $("chaos");
+      var shake = { a: 0 };
+      tl.fromTo(shake, { a: 0 }, {
+        a: 12, duration: 0.85, ease: "power2.in", immediateRender: false,
+        onUpdate: function () {
+          var t = tl.time();
+          gsap.set(chaos, {
+            x: shake.a * Math.sin(t * 71.3),
+            y: shake.a * 0.7 * Math.cos(t * 93.7),
+            rotation: (shake.a / 12) * Math.sin(t * 41.9),
+          });
+        },
+      }, 1.0);
+      tl.fromTo($("scrim"), { opacity: 0 }, { opacity: 1, duration: 0.14, ease: "power2.out" }, 0.2);
+      tl.set([ghostHost, sliceHost], { autoAlpha: 1 }, 1.8);
+      var JIT = 1 / 30;
+      var gl = { a: 0 };
+      tl.fromTo(gl, { a: 0.55 }, {
+        a: 1, duration: 0.15, ease: "power1.in", immediateRender: false,
+        onUpdate: function () {
+          var tt = tl.time();
+          var step = Math.floor(tt / JIT);
+          var A = tt >= 1.8 && tt < 1.95 ? gl.a : 0;
+          [ghostM, ghostC].forEach(function (el, layer) {
+            var jx = (hash(step * 13 + layer * 7) * 2 - 1) * 26 * A + (layer ? -10 : 10) * A;
+            var jy = (hash(step * 29 + layer * 11) * 2 - 1) * 9 * A;
+            gsap.set(el, { x: jx, y: jy });
+          });
+          slices.forEach(function (el, i) {
+            var dir = hash(step * 3 + i * 17) > 0.5 ? 1 : -1;
+            var off = dir * (30 + hash(step * 5 + i * 31) * 90) * A;
+            gsap.set(el, { x: off, scaleX: 1 + hash(step * 7 + i) * 0.12 * A });
+          });
+          gsap.set(world, { x: (hash(step * 41) * 2 - 1) * 8 * A });
+        },
+      }, 1.8);
+      var home = $("home");
+      gsap.set(home, { autoAlpha: 0 });
+      tl.set([chaos, $("scrim")], { autoAlpha: 0 }, 1.95);
+      tl.set(home, { autoAlpha: 1 }, 1.95);
+      tl.fromTo($("flash"), { opacity: 1 }, { opacity: 0, duration: 0.17, ease: "power2.out", immediateRender: false }, 1.95);
+      tl.to(".s1-chaos-home-glow", { opacity: 0.95, duration: 0.6, ease: "power2.out" }, 1.95);
+      tl.fromTo($("glow-a"), { x: 0, y: 0 }, { x: -60, y: -120, duration: 4, ease: "sine.inOut" }, 0);
+      tl.fromTo($("glow-b"), { x: 0, y: 0 }, { x: 120, y: 60, duration: 4, ease: "sine.inOut" }, 0);
+      tl.fromTo($("glow-c"), { x: 0, y: 0 }, { x: -90, y: -40, duration: 4, ease: "sine.inOut" }, 0);
+      tl.fromTo($("halo"), { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: 0.7, ease: "power2.out", immediateRender: false }, 1.95);
+      tl.fromTo($("window"), { scale: 1.05, filter: "blur(10px)" },
+        { scale: 1, filter: "blur(0px)", duration: 0.32, ease: "expo.out", immediateRender: false }, 1.95);
+      tl.fromTo($("hello"), { y: 24, opacity: 0 }, { y: 0, opacity: 1, duration: 0.35, ease: "power3.out" }, 2.0);
+      tl.fromTo($("date"), { y: 24, opacity: 0 }, { y: 0, opacity: 1, duration: 0.35, ease: "power3.out" }, 2.08);
+      tl.fromTo($("wave"), { rotation: 0 }, { rotation: 18, duration: 0.14, ease: "sine.inOut", immediateRender: false }, 2.25);
+      tl.fromTo($("wave"), { rotation: 18 }, { rotation: -10, duration: 0.16, ease: "sine.inOut", immediateRender: false }, 2.39);
+      tl.fromTo($("wave"), { rotation: -10 }, { rotation: 0, duration: 0.18, ease: "sine.out", immediateRender: false }, 2.55);
+      var KPI_N = [8, 13, 24, 5];
+      for (var i = 0; i < 4; i++) {
+        tl.fromTo($("kpi-" + i), { scale: 0, opacity: 0, y: 24 },
+          { scale: 1, opacity: 1, y: 0, duration: 0.42, ease: "power3.out" }, 2.15 + i * 0.07);
+      }
+      var RING_START = [2.4, 2.52, 2.64, 2.76], RING_DUR = 1.0;
+      var BASE_SHADOW = "0 2px 6px rgba(34, 25, 51, 0.06)";
+      var GLOW_SHADOW = "0 0 0 4px rgba(109, 0, 204, 0.22), 0 12px 48px rgba(109, 0, 204, 0.42)";
+      var SPARK_COLORS = ["#6D00CC", "#A518DB", "#C9A8F5", "#6D00CC", "#C9A8F5"];
+      function buildCounter(i) {
+        var arc = $("ring-arc-" + i), pct = $("ring-pct-" + i), num = $("kpi-num-" + i);
+        var len = 0;
+        if (arc) {
+          len = arc.getTotalLength ? arc.getTotalLength() : 2 * Math.PI * 61;
+          if (!len) len = 2 * Math.PI * 61;
+          arc.style.strokeDasharray = len + " " + (len + 2);
+          gsap.set(arc, { strokeDashoffset: len, opacity: 0 });
+          tl.set(arc, { opacity: 1 }, RING_START[i] + 0.02);
+          tl.fromTo(arc, { strokeDashoffset: len }, { strokeDashoffset: 0, duration: RING_DUR, ease: "power2.inOut", immediateRender: false }, RING_START[i]);
+        }
+        var pv = { v: 0 };
+        tl.fromTo(pv, { v: 0 }, {
+          v: 1, duration: RING_DUR, ease: "power2.inOut", immediateRender: false,
+          onUpdate: function () {
+            if (pct) pct.textContent = Math.round(pv.v * 100) + "%";
+            num.textContent = String(Math.round(pv.v * KPI_N[i]));
+          },
+        }, RING_START[i]);
+      }
+      for (var r = 0; r < 4; r++) buildCounter(r);
+      function buildBurst(i) {
+        var T = RING_START[i] + RING_DUR;
+        var tile = $("kpi-" + i), wrap = $("ring-wrap-" + i), glow = $("ring-glow-" + i), field = $("pfield-" + i);
+        tl.set(tile, { zIndex: 5 + i }, T - 0.01);
+        tl.fromTo(tile, { boxShadow: BASE_SHADOW }, { boxShadow: GLOW_SHADOW, duration: 0.12, ease: "power2.out", immediateRender: false }, T);
+        tl.fromTo(tile, { boxShadow: GLOW_SHADOW }, { boxShadow: BASE_SHADOW, duration: 0.4, ease: "power2.inOut", immediateRender: false }, T + 0.12);
+        tl.fromTo(wrap, { scale: 1 }, { scale: 1.09, duration: 0.12, ease: "power2.out", immediateRender: false }, T);
+        tl.fromTo(wrap, { scale: 1.09 }, { scale: 1, duration: 0.3, ease: "power2.inOut", immediateRender: false }, T + 0.12);
+        tl.fromTo(glow, { opacity: 0, scale: 0.7 }, { opacity: 1, scale: 1.12, duration: 0.14, ease: "power2.out", immediateRender: false }, T);
+        tl.fromTo(glow, { opacity: 1, scale: 1.12 }, { opacity: 0, scale: 1.35, duration: 0.4, ease: "power2.in", immediateRender: false }, T + 0.14);
+        var COUNT = 10, FLIGHT = 0.5, G = 140, parts = [];
+        for (var k = 0; k < COUNT; k++) {
+          var el = document.createElement("div");
+          el.className = P + "-spark";
+          var size = 16 + rnd() * 18;
+          el.style.width = size + "px";
+          el.style.height = size + "px";
+          el.style.marginLeft = (-size / 2) + "px";
+          el.style.marginTop = (-size / 2) + "px";
+          el.style.background = SPARK_COLORS[(k + i) % SPARK_COLORS.length];
+          field.appendChild(el);
+          var ang = (k / COUNT) * Math.PI * 2 + (rnd() - 0.5) * 0.5;
+          var sp = 260 + rnd() * 260;
+          parts.push({ el: el, vx: Math.cos(ang) * sp, vy: Math.sin(ang) * sp, r0: 54 + rnd() * 10, spin: (rnd() * 2 - 1) * 200 });
+        }
+        var d = { T: 0 };
+        tl.fromTo(d, { T: 0 }, {
+          T: 1, duration: FLIGHT, ease: "none", immediateRender: false,
+          onUpdate: function () {
+            var t = d.T * FLIGHT;
+            var fade = Math.min(1, (1 - d.T) / 0.35);
+            var sc = 0.5 + 0.6 * Math.sin(Math.PI * Math.min(1, d.T * 1.4));
+            parts.forEach(function (p) {
+              var dx = p.vx / Math.hypot(p.vx, p.vy), dy = p.vy / Math.hypot(p.vx, p.vy);
+              var x = dx * p.r0 + p.vx * t;
+              var y = dy * p.r0 + p.vy * t + 0.5 * G * t * t;
+              p.el.style.transform = "translate(" + x + "px," + y + "px) rotate(" + (p.spin * t) + "deg) scale(" + sc + ")";
+              p.el.style.opacity = String(d.T === 0 ? 0 : fade);
+            });
+          },
+        }, T);
+      }
+      for (var b = 0; b < 3; b++) buildBurst(b);
+      tl.fromTo($("card"), { y: 90, opacity: 0 }, { y: 0, opacity: 1, duration: 0.4, ease: "power3.out" }, 2.5);
+      tl.fromTo($("todo-0"), { x: -40, opacity: 0 }, { x: 0, opacity: 1, duration: 0.32, ease: "power3.out" }, 2.6);
+      tl.fromTo($("todo-1"), { x: -40, opacity: 0 }, { x: 0, opacity: 1, duration: 0.32, ease: "power3.out" }, 2.68);
+      var tw = $("twinkles"), stars = [];
+      var SPOTS = [[110, 300], [300, 455], [520, 270], [760, 430], [960, 310], [420, 360], [660, 330], [880, 480], [200, 520], [180, 1650], [880, 1690], [520, 1760], [40, 980], [1030, 820], [36, 1380]];
+      SPOTS.forEach(function (s, i) {
+        var el = document.createElement("div");
+        el.className = P + "-twinkle";
+        var size = 18 + rnd() * 22;
+        el.style.width = size + "px";
+        el.style.height = size + "px";
+        el.style.left = (s[0] - size / 2) + "px";
+        el.style.top = (s[1] - size / 2) + "px";
+        el.style.background = i % 3 === 0 ? "#FFFFFF" : (i % 3 === 1 ? "#C9A8F5" : "#E5CFFA");
+        tw.appendChild(el);
+        stars.push({ el: el, ph: rnd() * Math.PI * 2, f: 1.4 + rnd() * 1.6, peak: 0.55 + rnd() * 0.4 });
+      });
+      var amb = { k: 0 };
+      tl.fromTo(amb, { k: 0 }, {
+        k: 1, duration: 2.05, ease: "none", immediateRender: false,
+        onUpdate: function () {
+          var t = tl.time();
+          var env = Math.max(0, Math.min(1, (t - 1.95) / 0.4));
+          stars.forEach(function (s) {
+            var w = 0.5 + 0.5 * Math.sin(t * s.f * Math.PI * 2 + s.ph);
+            s.el.style.opacity = String(env * s.peak * (0.25 + 0.75 * w));
+            s.el.style.transform = "translateY(" + (-(t - 1.95) * 14) + "px) scale(" + (0.6 + 0.5 * w) + ") rotate(" + (w * 30) + "deg)";
+          });
+        },
+      }, 1.95);
+      window.__timelines = window.__timelines || {};
+      window.__timelines["s1-chaos-home"] = tl;
+    })();
+  </script>
+</template>

@@ -1,0 +1,20 @@
+{
+  "scene": "s2-gantt-todos",
+  "duration_s": 7.0,
+  "rules": [
+    "spring-pop-entrance",
+    "viewport-change",
+    "scale-swap-transition",
+    "press-release-spring",
+    "svg-path-draw",
+    "particle-burst"
+  ],
+  "exit": {
+    "vector": "slow outward push: app window scale 1.000 -> 1.012 (sine.in, 6.1-7.0s), ~0.021 scale/s at t=7.0 = ~10 px/s outward at the window edges; ambient glows settle to rest (sine.inOut), background sparkles keep twinkling",
+    "still_moving": true
+  },
+  "entry": {
+    "vector": "whip-in settle: app window scale 1.06 -> 1 with blur 10px -> 0 (expo.out, 0-0.35s), ~1.2 scale/s at t=0 = ~570-620 px/s inward contraction at the window edges",
+    "from_rest": false
+  }
+}

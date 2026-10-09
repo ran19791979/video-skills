@@ -1,0 +1,13 @@
+{
+  "scene": "s4-brand-cta",
+  "duration_s": 7.0,
+  "rules": ["svg-path-draw", "waterfall-entry", "svg-icon-enrichment", "ambient-glow-bloom", "sine-wave-loop", "spring-pop-entrance", "press-release-spring"],
+  "exit": {
+    "vector": "final frame at rest: sign, tagline and CTA static; background glows end their sine.inOut drift at 0 px/s; resident glints finish a sine.inOut turn at 0 deg/s; neon breathe amplitude enveloped to 0 over the last ~0.6 s; all twinkles finished by ~6.94 s",
+    "still_moving": false
+  },
+  "entry": {
+    "vector": "pure white frame (continues the root flash); purple field opens as a centre circle clip from radius 0 on expo.inOut (starts at rest, covers the frame by ~0.38 s); lilac band starts off-frame right and sweeps right-to-left on power2.inOut (starts at rest)",
+    "from_rest": true
+  }
+}

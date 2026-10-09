@@ -1,0 +1,7 @@
+{
+  "scene": "s3-write-desk",
+  "duration_s": 7.0,
+  "rules": ["discrete-text-sequence", "context-sensitive-cursor", "particle-burst", "cursor-click-ripple", "press-release-spring", "ambient-glow-bloom", "scale-swap-transition", "svg-path-draw"],
+  "exit": { "vector": "radial outward push: app window scale 1.000 -> 1.012 (sine.in, 6.2-7.0s), ~0.024 scale/s at the last frame = ~17 px/s outward at the window corners; button halo and toast glow still breathing (opacity only)", "still_moving": true },
+  "entry": { "vector": "radial inward whip-in: app window scale 1.06 -> 1.00 + blur 10px -> 0 (expo.out, 0.35s), ~1.19 scale/s at frame 0 = ~840 px/s inward at the window corners; form rises 24-40 px -> 0 from 0.05s", "from_rest": false }
+}

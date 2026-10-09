@@ -1,0 +1,336 @@
+<template>
+  <style>
+    @font-face { font-family: "Rubik"; src: url("assets/fonts/rubik-hebrew-600-normal.woff2") format("woff2"); font-weight: 600; unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F; }
+    @font-face { font-family: "Rubik"; src: url("assets/fonts/rubik-latin-600-normal.woff2") format("woff2"); font-weight: 600; }
+    @font-face { font-family: "Rubik"; src: url("assets/fonts/rubik-hebrew-700-normal.woff2") format("woff2"); font-weight: 700; unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F; }
+    @font-face { font-family: "Rubik"; src: url("assets/fonts/rubik-latin-700-normal.woff2") format("woff2"); font-weight: 700; }
+    @font-face { font-family: "Rubik"; src: url("assets/fonts/rubik-hebrew-800-normal.woff2") format("woff2"); font-weight: 800; unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F; }
+    @font-face { font-family: "Rubik"; src: url("assets/fonts/rubik-latin-800-normal.woff2") format("woff2"); font-weight: 800; }
+
+    #root { position: absolute; inset: 0; width: 1080px; height: 1920px; overflow: hidden; font-family: "Rubik", sans-serif; }
+    #root * { box-sizing: border-box; }
+
+    /* ---------- background: white -> lilac band -> purple field (circle wipe) ---------- */
+    #s4-brand-cta-bg { position: absolute; inset: 0; overflow: hidden; background: #FFFFFF; }
+    #s4-brand-cta-band {
+      position: absolute; left: 260px; top: -490px; width: 560px; height: 2900px;
+      background: linear-gradient(90deg, rgba(255,255,255,0) 0%, #F5EBFF 18%, #E5CFFA 38%, #C9A8F5 52%, #E5CFFA 68%, #F5EBFF 84%, rgba(255,255,255,0) 100%);
+      filter: blur(26px);
+    }
+    #s4-brand-cta-field { position: absolute; inset: 0; overflow: hidden; clip-path: circle(0px at 540px 960px); }
+    #s4-brand-cta-field-inner {
+      position: absolute; inset: -120px;
+      background:
+        radial-gradient(ellipse 62% 46% at 50% 49%, rgba(20,5,43,0) 0%, rgba(20,5,43,0) 30%, rgba(20,5,43,0.5) 66%, rgba(20,5,43,0.9) 100%),
+        linear-gradient(198deg, #D63ACF 0%, #A518DB 48%, #6D00CC 100%);
+      transform-origin: 50% 50%;
+    }
+    .s4-brand-cta-glow { position: absolute; border-radius: 50%; }
+    #s4-brand-cta-glow-a {
+      left: -300px; top: 40px; width: 1000px; height: 1000px;
+      background: radial-gradient(circle, rgba(201,168,245,0.26) 0%, rgba(165,24,219,0.16) 42%, rgba(165,24,219,0) 70%);
+    }
+    #s4-brand-cta-glow-b {
+      left: 420px; top: 1180px; width: 900px; height: 900px;
+      background: radial-gradient(circle, rgba(229,207,250,0.24) 0%, rgba(165,24,219,0.2) 42%, rgba(165,24,219,0) 70%);
+    }
+    #s4-brand-cta-rim { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; overflow: visible; }
+    #s4-brand-cta-rim-soft { filter: blur(14px); }
+
+    /* ---------- stage ---------- */
+    #s4-brand-cta-stage { position: absolute; inset: 0; }
+    #s4-brand-cta-halo {
+      position: absolute; left: 20px; top: 430px; width: 1040px; height: 720px; border-radius: 50%;
+      background: radial-gradient(ellipse 50% 50% at 50% 50%, rgba(201,168,245,0.55) 0%, rgba(165,24,219,0.4) 42%, rgba(109,0,204,0) 72%);
+      opacity: 0; z-index: 1;
+    }
+
+    /* neon brand */
+    #s4-brand-cta-neon {
+      position: absolute; left: 130px; top: 600px; width: 820px; height: 370px; z-index: 2;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+      direction: rtl; text-align: center; color: #FFFFFF;
+    }
+    .s4-brand-cta-word { position: relative; white-space: nowrap; }
+    #s4-brand-cta-w1 { font-size: 140px; font-weight: 800; line-height: 1.06; }
+    #s4-brand-cta-w2 { font-size: 92px; font-weight: 600; line-height: 1.1; letter-spacing: 0.06em; padding-left: 0.06em; }
+    .s4-brand-cta-unlit { display: block; color: rgba(255,255,255,0.06); -webkit-text-stroke: 2px rgba(201,168,245,0.3); }
+    .s4-brand-cta-lit {
+      position: absolute; inset: 0; display: block; opacity: 0; color: #FFFFFF;
+      text-shadow: 0 0 2px rgba(255,255,255,0.95), 0 0 10px rgba(201,168,245,0.9), 0 0 28px rgba(109,0,204,0.45), 0 0 60px rgba(109,0,204,0.45);
+    }
+    .s4-brand-cta-fullsvg { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; overflow: visible; pointer-events: none; }
+    #s4-brand-cta-frame { z-index: 3; filter: drop-shadow(0 0 3px rgba(255,255,255,0.75)) drop-shadow(0 0 12px rgba(201,168,245,0.95)) drop-shadow(0 0 30px rgba(109,0,204,0.9)); }
+    .s4-brand-cta-tube { fill: none; stroke: #C9A8F5; stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; stroke-opacity: 0.8; }
+
+    /* tagline */
+    #s4-brand-cta-tag {
+      position: absolute; left: 60px; top: 1036px; width: 960px; height: 110px; z-index: 4;
+      display: flex; align-items: center; justify-content: center; gap: 18px;
+      direction: rtl; color: #FFFFFF; font-size: 64px; font-weight: 600; line-height: 1;
+    }
+    .s4-brand-cta-tw {
+      display: inline-block; opacity: 0; white-space: nowrap;
+      text-shadow: 0 0 2px rgba(255,255,255,0.6), 0 0 14px rgba(201,168,245,0.75), 0 0 34px rgba(109,0,204,0.55);
+    }
+    .s4-brand-cta-frag-wrap { display: inline-flex; direction: rtl; }
+    #s4-brand-cta-clock { width: 78px; height: 78px; margin-left: 8px; opacity: 0; overflow: visible; filter: drop-shadow(0 0 6px rgba(201,168,245,0.85)) drop-shadow(0 0 16px rgba(109,0,204,0.7)); }
+    .s4-brand-cta-clk { fill: none; stroke: #C9A8F5; stroke-width: 2.1; stroke-linecap: round; stroke-linejoin: round; }
+    .s4-brand-cta-hand { stroke: #FFFFFF; stroke-width: 2.1; stroke-linecap: round; }
+
+    /* CTA */
+    #s4-brand-cta-cta-wrap { position: absolute; left: 0; top: 1240px; width: 1080px; height: 120px; z-index: 5; display: flex; align-items: center; justify-content: center; }
+    #s4-brand-cta-cta-halo {
+      position: absolute; left: 110px; top: -120px; width: 860px; height: 360px; border-radius: 50%;
+      background: radial-gradient(ellipse 50% 50% at 50% 50%, rgba(229,207,250,0.7) 0%, rgba(201,168,245,0.4) 38%, rgba(165,24,219,0) 72%);
+      opacity: 0;
+    }
+    #s4-brand-cta-burst {
+      position: absolute; left: 200px; top: -10px; width: 680px; height: 140px; border-radius: 999px;
+      background: radial-gradient(ellipse 50% 50% at 50% 50%, rgba(229,207,250,0.95) 0%, rgba(201,168,245,0.7) 40%, rgba(165,24,219,0) 75%);
+      filter: blur(26px); opacity: 0;
+    }
+    #s4-brand-cta-cta {
+      position: relative; display: inline-flex; align-items: center; gap: 22px; height: 120px; padding: 0 64px;
+      border-radius: 999px; background: #FFFFFF; color: #6D00CC; font-size: 54px; font-weight: 700; line-height: 1;
+      direction: rtl; white-space: nowrap; overflow: hidden; transform-origin: 50% 50%;
+      box-shadow: 0 18px 50px rgba(20,5,43,0.5), 0 0 0 3px rgba(229,207,250,0.6);
+    }
+    #s4-brand-cta-chat { width: 62px; height: 62px; flex: none; overflow: visible; }
+    .s4-brand-cta-chat-stroke { fill: none; stroke: #6D00CC; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+    .s4-brand-cta-dot { fill: #6D00CC; }
+    #s4-brand-cta-cta-label { position: relative; z-index: 2; }
+    #s4-brand-cta-sheen {
+      position: absolute; top: -40px; left: 50%; width: 150px; height: 200px; margin-left: -75px; z-index: 1;
+      background: linear-gradient(90deg, rgba(229,207,250,0) 0%, rgba(201,168,245,0.55) 50%, rgba(229,207,250,0) 100%);
+      opacity: 0;
+    }
+
+    /* sparkles */
+    #s4-brand-cta-sparks { position: absolute; inset: 0; z-index: 6; pointer-events: none; }
+    .s4-brand-cta-spark { position: absolute; opacity: 0; transform-origin: 50% 50%; overflow: visible; }
+    .s4-brand-cta-spark path { stroke: none; }
+  </style>
+
+  <div id="root" data-composition-id="s4-brand-cta" data-width="1080" data-height="1920">
+    <!-- full-bleed ground: white -> lilac band -> purple field opened by a circle wipe -->
+    <div id="s4-brand-cta-bg" class="clip" data-start="0" data-duration="7" data-track-index="0">
+      <div id="s4-brand-cta-band"></div>
+      <div id="s4-brand-cta-field">
+        <div id="s4-brand-cta-field-inner">
+          <div id="s4-brand-cta-glow-a" class="s4-brand-cta-glow"></div>
+          <div id="s4-brand-cta-glow-b" class="s4-brand-cta-glow"></div>
+        </div>
+      </div>
+      <svg id="s4-brand-cta-rim" viewBox="0 0 1080 1920" xmlns="http://www.w3.org/2000/svg">
+        <circle id="s4-brand-cta-rim-soft" cx="540" cy="960" r="0" fill="none" stroke="#FFFFFF" stroke-width="46" opacity="0" />
+        <circle id="s4-brand-cta-rim-core" cx="540" cy="960" r="0" fill="none" stroke="#F5EBFF" stroke-width="6" opacity="0" />
+      </svg>
+    </div>
+
+    <div id="s4-brand-cta-stage" class="clip" data-start="0" data-duration="7" data-track-index="1">
+      <div id="s4-brand-cta-halo"></div>
+
+      <div id="s4-brand-cta-neon">
+        <div id="s4-brand-cta-w1" class="s4-brand-cta-word">
+          <span class="s4-brand-cta-unlit" id="s4-brand-cta-unlit1">רובי יניר</span>
+          <span class="s4-brand-cta-lit" id="s4-brand-cta-lit1">רובי יניר</span>
+        </div>
+        <div id="s4-brand-cta-w2" class="s4-brand-cta-word">
+          <span class="s4-brand-cta-unlit" id="s4-brand-cta-unlit2">אוטומציה</span>
+          <span class="s4-brand-cta-lit" id="s4-brand-cta-lit2">אוטומציה</span>
+        </div>
+      </div>
+
+      <svg id="s4-brand-cta-frame" class="s4-brand-cta-fullsvg" viewBox="0 0 1080 1920" xmlns="http://www.w3.org/2000/svg">
+        <path id="s4-brand-cta-tube-r" class="s4-brand-cta-tube" d="M540 600 H890 A60 60 0 0 1 950 660 V910 A60 60 0 0 1 890 970 H540" />
+        <path id="s4-brand-cta-tube-l" class="s4-brand-cta-tube" d="M540 600 H190 A60 60 0 0 0 130 660 V910 A60 60 0 0 0 190 970 H540" />
+        <circle id="s4-brand-cta-head-r" cx="540" cy="600" r="7" fill="#FFFFFF" opacity="0" />
+        <circle id="s4-brand-cta-head-l" cx="540" cy="600" r="7" fill="#FFFFFF" opacity="0" />
+      </svg>
+
+      <div id="s4-brand-cta-tag">
+        <svg id="s4-brand-cta-clock" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path id="s4-brand-cta-clk-arc" class="s4-brand-cta-clk" d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+          <path id="s4-brand-cta-clk-arrow" class="s4-brand-cta-clk" d="M3 3v5h5" />
+          <line id="s4-brand-cta-hand-h" class="s4-brand-cta-hand" x1="12" y1="12" x2="12" y2="7.6" />
+          <line id="s4-brand-cta-hand-m" class="s4-brand-cta-hand" x1="12" y1="12" x2="12" y2="6.4" />
+          <circle cx="12" cy="12" r="1.2" fill="#FFFFFF" />
+        </svg>
+        <span id="s4-brand-cta-tw1" class="s4-brand-cta-tw">מחזירים</span>
+        <span id="s4-brand-cta-tw2" class="s4-brand-cta-tw">לכם</span>
+        <span id="s4-brand-cta-tw3" class="s4-brand-cta-tw">את</span>
+        <span class="s4-brand-cta-frag-wrap"><span id="s4-brand-cta-tw4a" class="s4-brand-cta-tw">הז</span><span id="s4-brand-cta-tw4b" class="s4-brand-cta-tw">מן</span></span>
+      </div>
+
+      <div id="s4-brand-cta-cta-wrap">
+        <div id="s4-brand-cta-cta-halo"></div>
+        <div id="s4-brand-cta-burst"></div>
+        <div id="s4-brand-cta-cta">
+          <div id="s4-brand-cta-sheen"></div>
+          <svg id="s4-brand-cta-chat" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path class="s4-brand-cta-chat-stroke" d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z" />
+            <circle id="s4-brand-cta-dot1" class="s4-brand-cta-dot" cx="8" cy="12" r="1.35" />
+            <circle id="s4-brand-cta-dot2" class="s4-brand-cta-dot" cx="12" cy="12" r="1.35" />
+            <circle id="s4-brand-cta-dot3" class="s4-brand-cta-dot" cx="16" cy="12" r="1.35" />
+          </svg>
+          <span id="s4-brand-cta-cta-label">שלחו הודעה לפרטים</span>
+        </div>
+      </div>
+
+      <div id="s4-brand-cta-sparks"></div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      var P = "s4-brand-cta", DUR = 7;
+      var $ = function (n) { return document.getElementById(P + "-" + n); };
+      var tl = gsap.timeline({ paused: true });
+      function mulberry32(a) { return function () { a |= 0; a = (a + 0x6D2B79F5) | 0; var t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+      var rnd = mulberry32(18250925);
+      function dash(p, pad) { var len = p.getTotalLength() * pad; p.style.strokeDasharray = String(len); p.style.strokeDashoffset = String(len); return len; }
+
+      // ===== Scene 1 (0.00–0.75): purple-white color transition =====
+      // circle() % is relative to sqrt(w^2 + h^2) / sqrt(2) = 1557.7 px on 1080x1920 -> 15.577 px per %.
+      var field = $("field"), rims = [$("rim-soft"), $("rim-core")], circ = { p: 0 };
+      function applyCircle() {
+        var r = circ.p * 15.577, a = r < 24 ? r / 24 : (r > 980 ? Math.max(0, 1 - (r - 980) / 260) : 1);
+        field.style.clipPath = "circle(" + r.toFixed(1) + "px at 540px 960px)";
+        rims.forEach(function (c, i) { c.setAttribute("r", r.toFixed(1)); c.setAttribute("opacity", ((i ? 0.85 : 0.9) * a).toFixed(3)); });
+      }
+      applyCircle();
+      tl.to(circ, { p: 150, duration: 0.75, ease: "expo.inOut", onUpdate: applyCircle }, 0);
+      // lilac-to-white band sweeps diagonally (right -> left) just ahead of the circle
+      tl.fromTo($("band"), { x: 1650, rotation: 28 }, { x: -1650, rotation: 28, duration: 0.62, ease: "power2.inOut" }, 0);
+      // the purple field settles inward as it opens; two radial glows drift slowly (at rest on the final frame)
+      tl.fromTo($("field-inner"), { scale: 1.16 }, { scale: 1, duration: 1.6, ease: "power2.out" }, 0.1);
+      tl.fromTo($("glow-a"), { x: 0, y: 0, opacity: 0.5 }, { x: 230, y: 160, opacity: 1, duration: DUR, ease: "sine.inOut" }, 0);
+      tl.fromTo($("glow-b"), { x: 0, y: 0, opacity: 0.5 }, { x: -240, y: -190, opacity: 1, duration: DUR, ease: "sine.inOut" }, 0);
+
+      // ===== Scene 2 (0.80–2.50): neon brand =====
+      tl.fromTo([$("unlit1"), $("unlit2")], { opacity: 0 }, { opacity: 1, duration: 0.35, ease: "power1.out" }, 0.45);
+      // ignition: deterministic stepped flicker 0 -> .85 -> .15 -> 1 -> .5 -> 1 over 0.45 s, on the timeline clock
+      var FLICK = [[0, 0], [0.07, 0.85], [0.14, 0.15], [0.22, 1], [0.32, 0.5], [0.42, 1]];
+      [[$("lit1"), 0.85], [$("lit2"), 1.25]].forEach(function (w) {
+        FLICK.forEach(function (k) { tl.set(w[0], { opacity: k[1] }, w[1] + k[0]); });
+      });
+      // halo bloom behind the sign lands with the second word's ignition (~1.70)
+      tl.fromTo($("halo"), { opacity: 0, scale: 0.84 }, { opacity: 0.3, scale: 1, duration: 0.75, ease: "power2.out" }, 0.95);
+      // neon outline draws from top-centre outward around both lines (svg-path-draw), glowing heads lead the stroke
+      var tubes = [$("tube-r"), $("tube-l")], heads = [$("head-r"), $("head-l")];
+      var tubeLen = tubes.map(function (p) { return dash(p, 1); });
+      tubes.forEach(function (p, i) {
+        tl.fromTo(p, { strokeDashoffset: tubeLen[i] }, { strokeDashoffset: 0, duration: 0.9, ease: "power2.out" }, 1.4);
+      });
+      var draw = { p: 0 };
+      function applyHeads() {
+        heads.forEach(function (h, i) {
+          var pt = tubes[i].getPointAtLength(draw.p * tubeLen[i]);
+          h.setAttribute("cx", pt.x.toFixed(1)); h.setAttribute("cy", pt.y.toFixed(1));
+        });
+      }
+      applyHeads();
+      tl.to(draw, { p: 1, duration: 0.9, ease: "power2.out", onUpdate: applyHeads }, 1.4);
+      tl.fromTo(heads, { opacity: 0 }, { opacity: 1, duration: 0.08, ease: "none" }, 1.4);
+      tl.to(heads, { opacity: 0, duration: 0.25, ease: "power1.in" }, 2.1);
+      // glow breathes gently 2.5 -> end (bounded, ±15 %), amplitude settling to zero over the last ~0.6 s
+      var lit = [$("lit1"), $("lit2")], halo = $("halo"), br = { p: 0 }, CYC = 2;
+      function neonShadow(k) {
+        return "0 0 2px rgba(255,255,255,0.95), 0 0 " + (10 * k).toFixed(2) + "px rgba(201,168,245," + Math.min(1, 0.9 * k).toFixed(3) +
+          "), 0 0 " + (28 * k).toFixed(2) + "px rgba(109,0,204," + (0.45 * k).toFixed(3) + "), 0 0 " + (60 * k).toFixed(2) + "px rgba(109,0,204," + (0.45 * k).toFixed(3) + ")";
+      }
+      tl.to(br, {
+        p: Math.PI * 2 * CYC, duration: DUR - 2.5, ease: "none",
+        onUpdate: function () {
+          var u = br.p / (Math.PI * 2 * CYC), env = u < 0.86 ? 1 : Math.max(0, (1 - u) / 0.14);
+          var k = 1 + 0.15 * Math.sin(br.p) * env, sh = neonShadow(k);
+          lit.forEach(function (el) { el.style.textShadow = sh; });
+          tubes.forEach(function (el) { el.style.strokeOpacity = String(Math.min(0.95, 0.8 * k)); });
+          halo.style.opacity = String(0.3 * (1 + 0.15 * Math.sin(br.p + 0.6) * env));
+        },
+      }, 2.5);
+
+      // ===== Scene 3 (2.60–3.70): tagline waterfall + rewinding clock =====
+      var clock = $("clock"), clkParts = [$("clk-arc"), $("clk-arrow")];
+      tl.set(clock, { opacity: 1 }, 2.6);
+      tl.fromTo(clock, { scale: 0.6, y: 30 }, { scale: 1, y: 0, duration: 0.35, ease: "power4.out" }, 2.6);
+      var clkLen = clkParts.map(function (p) { return dash(p, 1.05); });
+      tl.fromTo(clkParts[0], { strokeDashoffset: clkLen[0] }, { strokeDashoffset: 0, duration: 0.42, ease: "power2.out" }, 2.6);
+      tl.fromTo(clkParts[1], { strokeDashoffset: clkLen[1] }, { strokeDashoffset: 0, duration: 0.2, ease: "power2.out" }, 2.6 + 0.42 * 0.75);
+      // hands spin BACKWARD two turns and settle (svg-icon-enrichment: SVG transform attribute, explicit centre)
+      var handM = $("hand-m"), handH = $("hand-h"), spin = { m: 720, h: 176.6 };
+      function applyHands() {
+        handM.setAttribute("transform", "rotate(" + spin.m.toFixed(2) + " 12 12)");
+        handH.setAttribute("transform", "rotate(" + spin.h.toFixed(2) + " 12 12)");
+      }
+      applyHands();
+      tl.to(spin, { m: 0, h: 116.6, duration: 1.05, ease: "back.out(1.3)", onUpdate: applyHands }, 2.68);
+      // words whip in from below, binary opacity, overlapping arrivals (waterfall-entry)
+      var F = 1 / 60, t = 2.64;
+      [["tw1", 76, 0.18, 2 * F], ["tw2", 46, 0.15, -F], ["tw3", 36, 0.12, -F], ["tw4a", 72, 0.16, -F - 0.02], ["tw4b", 72, 0.15, 0]].forEach(function (w) {
+        tl.set($(w[0]), { opacity: 1, y: w[1] }, t);
+        tl.to($(w[0]), { y: 0, duration: w[2], ease: "power4.out" }, t);
+        t += w[2] + w[3];
+      });
+
+      // ===== Scene 4 (3.90–4.80): CTA springs up =====
+      tl.fromTo($("cta-halo"), { opacity: 0, scale: 0.8 }, { opacity: 0.42, scale: 1, duration: 0.6, ease: "power2.out" }, 3.9);
+      tl.fromTo($("cta"), { scale: 0, opacity: 0, y: 40 }, { scale: 1, opacity: 1, y: 0, duration: 0.6, ease: "back.out(1.8)" }, 3.9);
+      ["dot1", "dot2", "dot3"].forEach(function (d, i) {
+        tl.fromTo($(d), { scale: 0, transformOrigin: "50% 50%" }, { scale: 1, duration: 0.24, ease: "power3.out" }, 4.32 + i * 0.09);
+      });
+      // one-pass lilac sheen across the pill, right -> left (reading direction)
+      tl.fromTo($("sheen"), { x: 420, rotation: 18, opacity: 0 }, { x: -420, rotation: 18, opacity: 1, duration: 0.6, ease: "none" }, 4.62);
+      tl.to($("sheen"), { opacity: 0, duration: 0.12, ease: "power1.in" }, 5.1);
+
+      // ===== Scene 5 (4.80–7.00): press pulse + sparkles + clean hold =====
+      var PRESS = 5.4, PRESS_DUR = 0.12, REL = PRESS + PRESS_DUR, RIM = "0 0 0 3px rgba(229,207,250,0.6)";
+      tl.to($("cta"), { scale: 0.96, boxShadow: "0 8px 22px rgba(20,5,43,0.45), " + RIM, duration: PRESS_DUR, ease: "power1.in" }, PRESS);
+      tl.to($("cta"), { scale: 1, boxShadow: "0 18px 50px rgba(20,5,43,0.5), " + RIM, duration: 0.55, ease: "back.out(1.4)" }, REL);
+      tl.fromTo($("burst"), { scale: 1, opacity: 0 }, { scale: 1.5, opacity: 0.7, duration: 0.42, ease: "power2.out" }, REL);
+      tl.to($("burst"), { opacity: 0, duration: 0.55, ease: "power2.in" }, REL + 0.42);
+
+      // seeded 2D four-point sparkles (white / lilac) around the sign and the CTA
+      var host = $("sparks"), NS = "http://www.w3.org/2000/svg";
+      var STAR = "M12 0 C12.9 7.6 16.4 11.1 24 12 C16.4 12.9 12.9 16.4 12 24 C11.1 16.4 7.6 12.9 0 12 C7.6 11.1 11.1 7.6 12 0 Z";
+      var COLORS = ["#FFFFFF", "#FFFFFF", "#C9A8F5", "#E5CFFA", "#FFFFFF", "#C9A8F5"];
+      var KEEP = [[138, 608, 942, 962], [150, 1028, 930, 1150], [176, 1228, 904, 1372]]; // sign, tagline, CTA
+      function blocked(x, y, rad) {
+        return KEEP.some(function (k) { return x + rad > k[0] && x - rad < k[2] && y + rad > k[1] && y - rad < k[3]; });
+      }
+      function makeSpark(x, y, size, color) {
+        var s = document.createElementNS(NS, "svg"), p = document.createElementNS(NS, "path");
+        s.setAttribute("viewBox", "0 0 24 24"); s.setAttribute("class", P + "-spark");
+        s.style.cssText = "width:" + size + "px;height:" + size + "px;left:" + (x - size / 2).toFixed(1) + "px;top:" + (y - size / 2).toFixed(1) +
+          "px;filter:drop-shadow(0 0 " + Math.round(size * 0.22) + "px rgba(201,168,245,0.95)) drop-shadow(0 0 " + Math.round(size * 0.5) + "px rgba(165,24,219,0.7))";
+        p.setAttribute("d", STAR); p.setAttribute("fill", color);
+        s.appendChild(p); host.appendChild(s);
+        return s;
+      }
+      // 6 resident glints (sign corners + CTA ends) pop in and stay lit, slowly turning to rest
+      var RESIDENT = [[952, 602, 44], [128, 968, 40], [128, 604, 30], [952, 968, 30], [905, 1232, 34], [178, 1370, 30]];
+      RESIDENT.forEach(function (r, i) {
+        var el = makeSpark(r[0], r[1], r[2], i % 2 ? "#E5CFFA" : "#FFFFFF"), at = 4.85 + i * 0.16;
+        tl.fromTo(el, { opacity: 0, scale: 0, rotation: -45 }, { opacity: 1, scale: 1, rotation: 0, duration: 0.45, ease: "power3.out" }, at);
+        tl.to(el, { rotation: 22, scale: 0.86, duration: DUR - (at + 0.45), ease: "sine.inOut" }, at + 0.45);
+      });
+      // 24 twinkles in a finite stagger, every one finished before the last frame
+      var pts = [], guard = 0;
+      while (pts.length < 24 && guard++ < 5000) {
+        var x = 70 + rnd() * 940, y = 380 + rnd() * 1240, size = 16 + rnd() * 30, ok = !blocked(x, y, size * 0.35);
+        pts.concat(RESIDENT).forEach(function (q) { var dx = q[0] - x, dy = q[1] - y; if (dx * dx + dy * dy < 100 * 100) ok = false; });
+        if (ok) pts.push([x, y, size]);
+      }
+      pts.forEach(function (pt, i) {
+        var el = makeSpark(pt[0], pt[1], pt[2], COLORS[i % COLORS.length]);
+        var at = 4.8 + (i / pts.length) * 1.15 + rnd() * 0.12, d = 0.62 + rnd() * 0.3, rot = (rnd() < 0.5 ? -1 : 1) * (40 + rnd() * 50);
+        tl.fromTo(el, { opacity: 0, scale: 0, rotation: 0 }, { opacity: 1, scale: 1, rotation: rot * 0.5, duration: d * 0.45, ease: "power2.out" }, at);
+        tl.to(el, { opacity: 0, scale: 0, rotation: rot, duration: d * 0.55, ease: "power2.in" }, at + d * 0.45);
+      });
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines["s4-brand-cta"] = tl;
+    })();
+  </script>
+</template>

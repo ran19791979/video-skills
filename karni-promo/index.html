@@ -1,0 +1,304 @@
+<!doctype html>
+<html lang="he" data-resolution="portrait">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <script src="assets/gsap.min.js"></script>
+    <style>
+      @font-face { font-family: "Rubik"; src: url("assets/fonts/rubik-hebrew-600-normal.woff2") format("woff2"); font-weight: 600; unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F; }
+      @font-face { font-family: "Rubik"; src: url("assets/fonts/rubik-latin-600-normal.woff2") format("woff2"); font-weight: 600; }
+      @font-face { font-family: "Rubik"; src: url("assets/fonts/rubik-hebrew-700-normal.woff2") format("woff2"); font-weight: 700; unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F; }
+      @font-face { font-family: "Rubik"; src: url("assets/fonts/rubik-latin-700-normal.woff2") format("woff2"); font-weight: 700; }
+      @font-face { font-family: "Rubik"; src: url("assets/fonts/rubik-hebrew-800-normal.woff2") format("woff2"); font-weight: 800; unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F; }
+      @font-face { font-family: "Rubik"; src: url("assets/fonts/rubik-latin-800-normal.woff2") format("woff2"); font-weight: 800; }
+
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body {
+        margin: 0;
+        width: 1080px;
+        height: 1920px;
+        overflow: hidden;
+        background: #14052b;
+      }
+      #root {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        font-family: "Rubik", sans-serif;
+      }
+      #base-bg {
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(ellipse at 50% 30%, #2a0a52 0%, #14052b 70%);
+      }
+      .scene-slot { position: absolute; inset: 0; }
+
+      /* ---------- root headline band (y 250–520), scenes 1–3 ---------- */
+      .headline {
+        position: absolute;
+        left: 40px;
+        right: 40px;
+        top: 250px;
+        height: 270px;
+        z-index: 20;
+      }
+      .hl-inner {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        direction: rtl;
+        text-align: center;
+        color: #ffffff;
+        font-weight: 800;
+        line-height: 1.12;
+      }
+      .hl-line {
+        display: flex;
+        gap: 0.26em;
+        justify-content: center;
+        white-space: nowrap;
+      }
+      .hl-word { display: inline-block; }
+      .glow-text {
+        text-shadow: 0 0 2px rgba(255, 255, 255, 0.6), 0 0 24px rgba(165, 24, 219, 0.55), 0 6px 30px rgba(20, 5, 43, 0.6);
+      }
+      .em {
+        color: #c9a8f5;
+        text-shadow: 0 0 2px rgba(255, 255, 255, 0.7), 0 0 18px rgba(201, 168, 245, 0.75), 0 0 46px rgba(109, 0, 204, 0.75);
+      }
+      #h1-text { font-size: 106px; }
+      #h1-ghost-a, #h1-ghost-b {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        direction: rtl;
+        font-size: 106px;
+        font-weight: 800;
+        mix-blend-mode: screen;
+        opacity: 0;
+      }
+      #h1-ghost-a { color: #d63acf; }
+      #h1-ghost-b { color: #8ad8ff; }
+      .hl-s { font-size: 76px; }
+      .hl-l { font-size: 104px; }
+
+      /* ---------- seam sweeps + flashes ---------- */
+      .seam {
+        position: absolute;
+        inset: 0;
+        z-index: 40;
+        pointer-events: none;
+        overflow: hidden;
+      }
+      .sweep-band {
+        position: absolute;
+        top: -400px;
+        left: 0;
+        width: 520px;
+        height: 2720px;
+        background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(229,207,250,0.75) 35%, rgba(255,255,255,0.95) 50%, rgba(229,207,250,0.75) 65%, rgba(255,255,255,0) 100%);
+        filter: blur(18px);
+        transform-origin: 50% 50%;
+      }
+      .flash {
+        position: absolute;
+        inset: 0;
+        background: #ffffff;
+      }
+    </style>
+  </head>
+  <body>
+    <div
+      id="root"
+      data-composition-id="main"
+      data-start="0"
+      data-duration="25"
+      data-width="1080"
+      data-height="1920"
+    >
+      <div id="base-bg" class="clip" data-start="0" data-duration="25" data-track-index="0"></div>
+
+      <!-- scenes -->
+      <div
+        id="s1-chaos-home"
+        class="scene-slot"
+        data-composition-id="s1-chaos-home"
+        data-composition-src="compositions/s1-chaos-home.html"
+        data-start="0"
+        data-duration="4"
+        data-track-index="1"
+        data-width="1080"
+        data-height="1920"
+      ></div>
+      <div
+        id="s2-gantt-todos"
+        class="scene-slot"
+        data-composition-id="s2-gantt-todos"
+        data-composition-src="compositions/s2-gantt-todos.html"
+        data-start="4"
+        data-duration="7"
+        data-track-index="1"
+        data-width="1080"
+        data-height="1920"
+      ></div>
+      <div
+        id="s3-write-desk"
+        class="scene-slot"
+        data-composition-id="s3-write-desk"
+        data-composition-src="compositions/s3-write-desk.html"
+        data-start="11"
+        data-duration="7"
+        data-track-index="1"
+        data-width="1080"
+        data-height="1920"
+      ></div>
+      <div
+        id="s4-brand-cta"
+        class="scene-slot"
+        data-composition-id="s4-brand-cta"
+        data-composition-src="compositions/s4-brand-cta.html"
+        data-start="18"
+        data-duration="7"
+        data-track-index="1"
+        data-width="1080"
+        data-height="1920"
+      ></div>
+
+      <!-- headline 1: "טובעים בטבלאות?" -->
+      <div id="hl1" class="headline clip" data-start="0" data-duration="1.97" data-track-index="3">
+        <div id="h1-shake" class="hl-inner">
+          <div id="h1-ghost-a">טובעים בטבלאות?</div>
+          <div id="h1-ghost-b">טובעים בטבלאות?</div>
+          <div id="h1-text" class="hl-line glow-text">
+            <span class="hl-word h1-w">טובעים</span>
+            <span class="hl-word h1-w">בטבלאות?</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- headline 2: "כל התוכן. כל הלקוחות. מערכת אחת." -->
+      <div id="hl2" class="headline clip" data-start="4" data-duration="7" data-track-index="3">
+        <div id="h2-inner" class="hl-inner">
+          <div class="hl-line hl-s glow-text">
+            <span class="hl-word" id="h2-p1">כל התוכן.</span>
+            <span class="hl-word" id="h2-p2">כל הלקוחות.</span>
+          </div>
+          <div class="hl-line hl-l">
+            <span class="hl-word em" id="h2-p3">מערכת אחת.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- headline 3: "יוצרים, מתזמנים ומשגרים בקליק אחד." -->
+      <div id="hl3" class="headline clip" data-start="11" data-duration="7" data-track-index="3">
+        <div id="h3-inner" class="hl-inner">
+          <div class="hl-line hl-s glow-text">
+            <span class="hl-word h3-w">יוצרים,</span>
+            <span class="hl-word h3-w">מתזמנים</span>
+            <span class="hl-word h3-w">ומשגרים</span>
+          </div>
+          <div class="hl-line hl-l">
+            <span class="hl-word em" id="h3-em">בקליק אחד.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- seams -->
+      <div id="seam1" class="seam clip" data-start="3.82" data-duration="0.4" data-track-index="4">
+        <div id="seam1-band" class="sweep-band"></div>
+        <div id="seam1-flash" class="flash"></div>
+      </div>
+      <div id="seam2" class="seam clip" data-start="10.82" data-duration="0.4" data-track-index="4">
+        <div id="seam2-band" class="sweep-band"></div>
+        <div id="seam2-flash" class="flash"></div>
+      </div>
+      <div id="seam3" class="seam clip" data-start="17.72" data-duration="0.3" data-track-index="4">
+        <div id="seam3-band" class="sweep-band"></div>
+        <div id="seam3-flash" class="flash"></div>
+      </div>
+    </div>
+
+    <script>
+      const tl = gsap.timeline({ paused: true });
+
+      // ---- Headline 1: slam in, shake with the chaos, glitch out on the cut ----
+      tl.fromTo("#h1-text", { scale: 1.9, opacity: 0, filter: "blur(14px)" },
+        { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.32, ease: "expo.out" }, 0.25);
+      tl.fromTo("#h1-text", { y: 0 }, { y: -6, duration: 0.08, ease: "power2.out", immediateRender: false }, 0.55);
+      tl.to("#h1-text", { y: 0, duration: 0.18, ease: "back.out(3)" }, 0.63);
+
+      // Deterministic shake: amplitude ramps 0 → 12 px between 1.0 and 1.85 s.
+      const shake = { a: 0 };
+      tl.fromTo(shake, { a: 0 }, {
+        a: 12, duration: 0.85, ease: "power2.in",
+        onUpdate: () => {
+          const t = tl.time();
+          gsap.set("#h1-shake", {
+            x: shake.a * Math.sin(t * 71.3),
+            y: shake.a * 0.7 * Math.cos(t * 93.7),
+            rotation: (shake.a / 12) * Math.sin(t * 41.9),
+          });
+        },
+      }, 1.0);
+
+      // Chromatic glitch burst (1.80–1.95): RGB ghosts jitter on quantized time.
+      const glitch = { k: 0 };
+      tl.fromTo(glitch, { k: 0 }, {
+        k: 1, duration: 0.15, ease: "none", immediateRender: false,
+        onUpdate: () => {
+          const q = Math.floor(tl.time() * 60);
+          const jx = ((q * 37) % 23) - 11;
+          const jy = ((q * 53) % 9) - 4;
+          gsap.set("#h1-ghost-a", { opacity: 0.85, x: jx * 1.6, y: jy });
+          gsap.set("#h1-ghost-b", { opacity: 0.85, x: -jx * 1.4, y: -jy });
+          gsap.set("#h1-text", { x: jx * 0.4 });
+        },
+      }, 1.8);
+      tl.set(["#h1-ghost-a", "#h1-ghost-b", "#h1-text"], { opacity: 0 }, 1.95);
+
+      // ---- Headline 2: three phrases arrive (4.35 / 4.85 / 5.45) ----
+      tl.fromTo("#h2-p1", { y: 70, opacity: 0, filter: "blur(10px)" },
+        { y: 0, opacity: 1, filter: "blur(0px)", duration: 0.42, ease: "expo.out" }, 4.35);
+      tl.fromTo("#h2-p2", { y: 70, opacity: 0, filter: "blur(10px)" },
+        { y: 0, opacity: 1, filter: "blur(0px)", duration: 0.42, ease: "expo.out" }, 4.85);
+      tl.fromTo("#h2-p3", { scale: 1.7, opacity: 0, filter: "blur(12px)" },
+        { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.38, ease: "expo.out" }, 5.45);
+      tl.fromTo("#h2-inner", { opacity: 1, filter: "blur(0px)" },
+        { opacity: 0, filter: "blur(12px)", duration: 0.16, ease: "power2.in" }, 10.8);
+
+      // ---- Headline 3: words stagger in, emphasis slams, re-glows on the click ----
+      tl.fromTo(".h3-w", { y: 60, opacity: 0, filter: "blur(8px)" },
+        { y: 0, opacity: 1, filter: "blur(0px)", duration: 0.36, ease: "expo.out", stagger: 0.13 }, 11.35);
+      tl.fromTo("#h3-em", { scale: 1.7, opacity: 0, filter: "blur(12px)" },
+        { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.38, ease: "expo.out" }, 11.9);
+      tl.fromTo("#h3-em", { scale: 1 }, { scale: 1.12, duration: 0.12, ease: "power2.out", immediateRender: false }, 16.0);
+      tl.to("#h3-em", { scale: 1, duration: 0.4, ease: "back.out(2.4)" }, 16.12);
+      tl.fromTo("#h3-em", { color: "#c9a8f5" }, { color: "#ffffff", duration: 0.12, immediateRender: false }, 16.0);
+      tl.to("#h3-em", { color: "#c9a8f5", duration: 0.5 }, 16.2);
+      tl.fromTo("#h3-inner", { opacity: 1, filter: "blur(0px)" },
+        { opacity: 0, filter: "blur(12px)", duration: 0.16, ease: "power2.in" }, 17.74);
+
+      // ---- Seam light sweeps (right → left, RTL reading direction) + flashes ----
+      function seam(id, start, flashPeak) {
+        tl.fromTo(`#${id}-band`, { x: 1300, rotation: 18 },
+          { x: -800, rotation: 18, duration: 0.36, ease: "power2.inOut" }, start);
+        tl.fromTo(`#${id}-flash`, { opacity: 0 },
+          { opacity: flashPeak, duration: 0.17, ease: "power2.in" }, start + 0.02);
+      }
+      seam("seam1", 3.82, 0.7);
+      tl.to("#seam1-flash", { opacity: 0, duration: 0.2, ease: "power2.out" }, 4.01);
+      seam("seam2", 10.82, 0.7);
+      tl.to("#seam2-flash", { opacity: 0, duration: 0.2, ease: "power2.out" }, 11.01);
+      seam("seam3", 17.72, 1.0); // ends at full white; scene 4 opens on white
+
+      window.__timelines["main"] = tl;
+    </script>
+  </body>
+</html>
